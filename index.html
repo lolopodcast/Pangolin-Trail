@@ -35,6 +35,8 @@ body{background:radial-gradient(circle at 50% 30%,#f7f4ec,#dfe6d6);font-family:v
   padding:6px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow);z-index:5;
   width:max-content;max-width:calc(100vw - 24px);flex-wrap:nowrap}
 #presetBtns{display:flex;gap:2px}
+#hud .btn{white-space:nowrap}
+@media (max-width:1100px){ #hud .btn{padding:0 9px} #hud .sep{margin:0 2px} }
 #clock{font:700 15px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--forest);padding:0 12px 0 14px;min-width:72px;text-align:center;letter-spacing:1px}
 .btn{min-height:44px;min-width:44px;padding:0 14px;border-radius:9px;border:0;background:transparent;color:var(--ink);font:600 13px var(--font);cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .15s,color .15s}
@@ -191,6 +193,9 @@ body.touring #card{max-height:calc(100vh - 144px - 250px)}
 #help[hidden]{display:none}
 .help-box{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px 22px 20px;position:relative}
 .help-box h2{margin:6px 44px 6px 0;color:var(--forest)}
+.lang-pick{display:inline-flex;gap:4px;margin:10px 0 2px;padding:4px;border-radius:12px;background:#efe9dc}
+.lang-pick .btn{min-height:40px;padding:0 16px;border-radius:9px;font-size:14px}
+.lang-pick .btn[aria-pressed="true"]{background:var(--forest);color:#fff}
 .help-steps{margin:14px 0 6px;padding:0;list-style:none;counter-reset:s}
 .help-steps li{counter-increment:s;position:relative;padding:10px 12px 10px 48px;margin:8px 0;border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(74,42,20,.06);font-size:13px;line-height:1.6}
 .help-steps li::before{content:counter(s);position:absolute;left:12px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--forest);color:var(--sand);font:700 12px ui-monospace,Consolas,monospace;display:grid;place-items:center}
@@ -205,6 +210,13 @@ body.touring #card{max-height:calc(100vh - 144px - 250px)}
 #rmNote{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:max-content;max-width:min(520px,calc(100vw - 32px));padding:9px 14px;border-radius:14px;background:rgba(31,36,33,.82);color:#fff;font-size:12px;line-height:1.6;z-index:9}
 #rmNote[hidden]{display:none}
 .help-box .rm-help{font-size:12px;margin:10px 0 0}
+.help-box .demo-links{font-size:11px;color:#6a7368;margin:8px 0 0}
+.help-box .demo-links a{color:var(--forest);font-weight:700;text-decoration:none;padding:2px 2px}
+.help-box .demo-links a:hover{text-decoration:underline}
+.en-sub{display:block;font-size:.82em;font-weight:500;color:#5b6359;margin-top:2px;line-height:1.45}
+.zone-label .en{font-weight:500;font-size:11px;color:#5b6359}
+.zone-label.active .en{color:#d8e6dd}
+#tour .en-sub{font-size:13px}
 .sheet-handle{display:none}
 body.demo #account{display:none}
 
@@ -374,6 +386,10 @@ body.reduce-motion .live-dot{animation:none}
   <div class="panel help-box" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <button class="close-x" id="helpClose" type="button" aria-label="關閉" data-i18n-aria="close">×</button>
     <div class="eyebrow">PANGOLIN STRATEGY TRAIL</div>
+    <div class="lang-pick" role="group" aria-label="語言 / Language">
+      <button type="button" class="btn" data-lang="zh" lang="zh-Hant-TW">中文</button>
+      <button type="button" class="btn" data-lang="en" lang="en">English</button>
+    </div>
     <h2 id="helpTitle" data-i18n="helpTitle">歡迎來到穿山甲大學</h2>
     <p class="muted" data-i18n="helpSub"></p>
     <ol class="help-steps">
@@ -383,6 +399,7 @@ body.reduce-motion .live-dot{animation:none}
     </ol>
     <p class="muted rm-help" data-i18n="rmHelp"></p>
     <p class="credit" data-i18n="credit"></p>
+    <p class="demo-links"><span data-i18n="demoLinks">簡報模式（教師用）</span>：<a href="?demo=1&amp;lang=zh">中文</a>｜<a href="?demo=1&amp;lang=en">English</a>｜<a href="?demo=1&amp;lang=both" data-i18n="demoBoth">中英並列</a></p>
     <div class="row">
       <button class="btn ghost" id="helpStart" type="button" data-i18n="helpStart">開始探索</button>
       <button class="btn primary" id="helpTour" type="button" data-i18n="helpTour">跟著洛洛走</button>
@@ -807,7 +824,7 @@ const DATA = {
       help3t: "跟著洛洛走", help3d: "按「跟著洛洛」自動導覽十個區塊；修課同學可從右上角「學生入口」進入單元。",
       helpStart: "開始探索", helpTour: "跟著洛洛走",
       credit: "作者：駱世民教授（國立暨南國際大學國際企業學系）・「穿山甲大學」為虛構世界・AI 協作開發・播放影片時才會連線到 YouTube",
-      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰",
+      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰", demoLinks: "簡報模式（教師用）", demoBoth: "中英並列",
       csvNote: "提醒：單元裡匯出的學習歷程 CSV 含有學號與姓名，請只透過課程平台繳交，不要貼到公開群組或公開連結。",
       rmNotice: "已依你的系統設定「減少動態效果」關閉動畫：鏡頭點選時會直接切換，時鐘與角色暫停不動。",
       rmHelp: "如果你的裝置開啟了「減少動態效果」，網站會自動關閉動畫，鏡頭改為直接切換。", filterTrails: "篩選概念線", nickPh: "小美"
@@ -838,7 +855,7 @@ const DATA = {
       help3t: "Follow Lolo", help3d: "Press “Tour” for a guided walk through all ten zones; enrolled students can sign in via “Student” at the top right.",
       helpStart: "Start exploring", helpTour: "Follow Lolo",
       credit: "By Prof. Shihmin Lo (Dept. of International Business Studies, National Chi Nan University) · “Pangolin University” is fictional · Built with AI assistance · Videos connect to YouTube only when played",
-      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view",
+      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view", demoLinks: "Presentation mode (for instructors)", demoBoth: "Bilingual",
       csvNote: "Reminder: the learning-record CSV exported from each unit contains your student ID and name. Submit it only through the course platform — never in public groups or public links.",
       rmNotice: "Animations are off because your system has “Reduce motion” turned on: the camera jumps instead of flying, and the clock and characters stay still.",
       rmHelp: "If your device has “Reduce motion” turned on, the site turns off animations and the camera jumps instead of flying.", filterTrails: "Filter by link", nickPh: "Mei"
@@ -850,7 +867,17 @@ const DATA = {
    小工具
    ============================================================ */
 const qs = new URLSearchParams(location.search);
-let lang = qs.get("lang") === "en" ? "en" : "zh";
+// 語言：網址參數 > 上次的選擇 > 瀏覽器語言（中文瀏覽器預設中文，其他預設英文）
+function initialLang() {
+  const q = qs.get("lang");
+  if (q === "en" || q === "zh") return q;
+  if (q === "both") return "zh";
+  try { const s = JSON.parse(localStorage.getItem("pst.lang")); if (s === "en" || s === "zh") return s; } catch { /* 忽略 */ }
+  return /^zh/i.test(navigator.language || "") ? "zh" : "en";
+}
+let lang = initialLang();
+let bilingual = qs.get("lang") === "both"; // 中英並列（簡報用）：中文為主，英文在下方
+const enSub = (o) => (bilingual && o && o.en ? o.en : "");
 const tr = (k) => DATA.i18n[lang][k] ?? DATA.i18n.zh[k] ?? k;
 const pick = (o) => (o && (o[lang] ?? o.zh)) || "";
 
@@ -881,6 +908,7 @@ function applyStaticI18n() {
   document.querySelectorAll("[data-i18n-title]").forEach((el) => el.setAttribute("title", tr(el.dataset.i18nTitle)));
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => el.setAttribute("placeholder", tr(el.dataset.i18nPh)));
   document.getElementById("langBtn").textContent = tr("lang");
+  document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   document.getElementById("app").setAttribute("aria-label", tr("sceneLabel"));
   document.getElementById("hud").setAttribute("aria-label", tr("hudLabel"));
   document.title = `${pick(DATA.meta.title)}｜${lang === "en" ? "穿山甲策略步道" : "Pangolin Strategy Trail"}`;
@@ -2327,7 +2355,7 @@ try {
     const el = document.createElement("button");
     el.type = "button";
     el.className = "zone-label";
-    el.innerHTML = `<span class="code">${t.zone.id}</span><span class="name"></span>`;
+    el.innerHTML = `<span class="code">${t.zone.id}</span><span class="name"></span><span class="en" hidden></span>`;
     el.addEventListener("pointerdown", (e) => e.stopPropagation());
     el.addEventListener("click", () => select("zone", t.zone.id));
     const obj = new CSS2DObject(el);
@@ -2339,7 +2367,10 @@ try {
     labelEls.forEach((el, id) => {
       const zone = DATA.zones.find((z) => z.id === id);
       el.querySelector(".name").textContent = pick(zone.name);
-      el.setAttribute("aria-label", `${id} ${pick(zone.name)}`);
+      const en = el.querySelector(".en");
+      en.textContent = enSub(zone.name);
+      en.hidden = !en.textContent;
+      el.setAttribute("aria-label", `${id} ${pick(zone.name)}${en.textContent ? " " + en.textContent : ""}`);
     });
   }
   renderLabels();
@@ -2567,8 +2598,8 @@ try {
       const z = zoneById.get(sel.id);
       const items = zoneItems(z.id);
       const greet = student ? (lang === "en" ? `${student.nick}, ` : `${student.nick}，`) : "";
-      h += `<div class="eyebrow">${esc(tr("zoneCard"))} · ${z.id} · ${weekRange(z)}</div><h2>${esc(pick(z.name))}</h2>`;
-      h += `<div class="tagline"><b>${esc(pick(DATA.meta.guide))}：</b>${esc(greet + pick(DATA.tour[z.id]))}</div>`;
+      h += `<div class="eyebrow">${esc(tr("zoneCard"))} · ${z.id} · ${weekRange(z)}</div><h2>${esc(pick(z.name))}${enSub(z.name) ? `<span class="en-sub">${esc(enSub(z.name))}</span>` : ""}</h2>`;
+      h += `<div class="tagline"><b>${esc(pick(DATA.meta.guide))}：</b>${esc(greet + pick(DATA.tour[z.id]))}${enSub(DATA.tour[z.id]) ? `<span class="en-sub">${esc(enSub(DATA.tour[z.id]))}</span>` : ""}</div>`;
       h += `<div class="muted">${z.weeks.map((w) => `${w}・${esc(pick(DATA.weeks[w]))}`).join("<br>")}</div>`;
       h += `<div class="sec"><div class="sec-title">${esc(tr("items"))} · ${items.length}</div>${items.map(itemButton).join("")}</div>`;
       const tids = trailsFor("zone", z.id);
@@ -2577,9 +2608,9 @@ try {
       h += `<div class="sec">${unitBlock(z.weeks)}</div>`;
     } else if (sel.type === "item") {
       const it = itemById.get(sel.id), z = zoneById.get(it.zone);
-      h += `<div class="eyebrow">${esc(tr("itemCard"))} · ${it.id} · ${z.id} ${esc(pick(z.name))}</div><h2>${esc(pick(it.name))}</h2>`;
+      h += `<div class="eyebrow">${esc(tr("itemCard"))} · ${it.id} · ${z.id} ${esc(pick(z.name))}</div><h2>${esc(pick(it.name))}${enSub(it.name) ? `<span class="en-sub">${esc(enSub(it.name))}</span>` : ""}</h2>`;
       h += `<canvas class="thumb" width="320" height="320" aria-hidden="true"></canvas>`;
-      if (it.plain) h += `<div class="muted">${esc(pick(it.plain))}</div>`;
+      if (it.plain) h += `<div class="muted">${esc(pick(it.plain))}${enSub(it.plain) ? `<span class="en-sub">${esc(enSub(it.plain))}</span>` : ""}</div>`;
       const tiles = numberTiles(it.facts || []);
       if (tiles.length) h += `<div class="tiles">${tiles.map((t) => `<div class="tile"><div class="num" title="${esc(t.num)}">${esc(t.num)}</div><div class="cap">${esc(t.cap)}</div></div>`).join("")}</div>`;
       if (it.facts && it.facts.length) h += `<div class="sec"><div class="sec-title">${esc(tr("keyPoints"))}</div><ol class="pts">${it.facts.map((f) => `<li>${esc(pick(f))}</li>`).join("")}</ol></div>`;
@@ -2591,7 +2622,7 @@ try {
     } else if (sel.type === "trail") {
       const t = trailById.get(sel.id);
       const lt = { case: tr("linkCase"), concept: tr("linkConcept"), extend: tr("linkExtend") }[t.link];
-      h += `<div class="eyebrow">${esc(tr("trailCard"))} · ${esc(lt)}</div><h2>${esc(pick(t.label))}</h2>`;
+      h += `<div class="eyebrow">${esc(tr("trailCard"))} · ${esc(lt)}</div><h2>${esc(pick(t.label))}${enSub(t.label) ? `<span class="en-sub">${esc(enSub(t.label))}</span>` : ""}</h2>`;
       if (sel.walker) h += `<div class="tagline"><b>${esc(pick(DATA.cast[sel.walker.species].name))}</b>・${esc(tr("walkerOn"))}</div>`;
       h += `<div class="sec"><div class="sec-title">${esc(tr("from"))}</div>${itemButton(itemById.get(t.from))}</div>`;
       h += `<div class="sec"><div class="sec-title">${esc(tr("to"))}</div>${itemButton(itemById.get(t.to))}</div>`;
@@ -2840,7 +2871,14 @@ try {
     const z = DATA.zones[tour.idx];
     document.getElementById("tourStep").textContent = ` ${tour.idx + 1} / ${n}`;
     const done = tour.idx === n - 1 && !tour.loop && tour.t >= TOUR_STEP_SEC;
-    document.getElementById("tourText").textContent = done ? tr("tourDone") : `${z.id} ${pick(z.name)}｜${tourGreeting()}${pick(DATA.tour[z.id])}`;
+    const tt = document.getElementById("tourText");
+    tt.textContent = done ? tr("tourDone") : `${z.id} ${pick(z.name)}｜${tourGreeting()}${pick(DATA.tour[z.id])}`;
+    if (bilingual) {
+      const en = document.createElement("span");
+      en.className = "en-sub";
+      en.textContent = done ? DATA.i18n.en.tourDone : `${z.id} ${z.name.en} | ${DATA.tour[z.id].en}`;
+      tt.appendChild(en);
+    }
     document.getElementById("tourPlay").textContent = tour.playing ? tr("tourPause") : tr("tourPlay");
     document.getElementById("tourPrev").disabled = tour.idx === 0;
     document.getElementById("tourNext").disabled = tour.idx === n - 1 && !tour.loop;
@@ -3067,8 +3105,13 @@ try {
   renderPause();
 
   /* ---------- 語言切換 ---------- */
-  document.getElementById("langBtn").addEventListener("click", () => {
-    lang = lang === "zh" ? "en" : "zh";
+  document.getElementById("langBtn").addEventListener("click", () => setLang(lang === "zh" ? "en" : "zh"));
+  document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  function setLang(next) {
+    if (next === lang && !bilingual) return;
+    lang = next;
+    bilingual = false; // 手動切換語言時結束中英並列
+    try { localStorage.setItem("pst.lang", JSON.stringify(lang)); } catch { /* 忽略 */ }
     const url = new URL(location.href);
     if (lang === "en") url.searchParams.set("lang", "en"); else url.searchParams.delete("lang");
     history.replaceState(null, "", url);
@@ -3080,7 +3123,7 @@ try {
     if (tour.on) renderTour();
     searchBox.placeholder = tr("search");
     pins.forEach((p, id) => p.el.setAttribute("aria-label", pick(itemById.get(id).name)));
-  });
+  }
 
   /* ---------- 尺寸 ---------- */
   function resize() {
