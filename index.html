@@ -202,6 +202,9 @@ body.touring #card{max-height:calc(100vh - 144px - 250px)}
 @media (max-width:1279px){#credit{display:none}}
 #demoHint{position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:8px 14px;border-radius:999px;background:rgba(31,36,33,.72);color:#fff;font-size:12px;z-index:9;transition:opacity 1s}
 #demoHint[hidden]{display:none}
+#rmNote{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:max-content;max-width:min(520px,calc(100vw - 32px));padding:9px 14px;border-radius:14px;background:rgba(31,36,33,.82);color:#fff;font-size:12px;line-height:1.6;z-index:9}
+#rmNote[hidden]{display:none}
+.help-box .rm-help{font-size:12px;margin:10px 0 0}
 .sheet-handle{display:none}
 body.demo #account{display:none}
 
@@ -246,6 +249,8 @@ body.demo #account{display:none}
 /* 鏡頭拉遠且畫面窄時，標籤只留代碼，避免互相重疊（完整避讓在 M3 實作） */
 body.compact-labels .zone-label{padding:4px}
 body.compact-labels .zone-label .name{display:none}
+body.reduce-motion #loading,body.reduce-motion .zone-label,body.reduce-motion #notice,body.reduce-motion .btn,body.reduce-motion .chip,body.reduce-motion .tour-bar span{transition:none!important}
+body.reduce-motion .live-dot{animation:none}
 @media (prefers-reduced-motion:reduce){
   #loading,.zone-label,#notice,.btn,.chip,.tour-bar span,#demoHint{transition:none!important}
   .live-dot{animation:none}
@@ -376,6 +381,7 @@ body.compact-labels .zone-label .name{display:none}
       <li><b data-i18n="help2t"></b><span data-i18n="help2d"></span></li>
       <li><b data-i18n="help3t"></b><span data-i18n="help3d"></span></li>
     </ol>
+    <p class="muted rm-help" data-i18n="rmHelp"></p>
     <p class="credit" data-i18n="credit"></p>
     <div class="row">
       <button class="btn ghost" id="helpStart" type="button" data-i18n="helpStart">開始探索</button>
@@ -386,6 +392,7 @@ body.compact-labels .zone-label .name{display:none}
 
 <footer id="credit" data-i18n="credit"></footer>
 <div id="demoHint" hidden data-i18n="fullscreenHint">按 F 切換全螢幕</div>
+<div id="rmNote" role="status" hidden data-i18n="rmNotice"></div>
 
 <aside id="legend" hidden>
   <div class="lg-title" data-i18n="legendTitle">概念線</div>
@@ -800,7 +807,10 @@ const DATA = {
       help3t: "跟著洛洛走", help3d: "按「跟著洛洛」自動導覽十個區塊；修課同學可從右上角「學生入口」進入單元。",
       helpStart: "開始探索", helpTour: "跟著洛洛走",
       credit: "作者：駱世民教授（國立暨南國際大學國際企業學系）・「穿山甲大學」為虛構世界・AI 協作開發・播放影片時才會連線到 YouTube",
-      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰", filterTrails: "篩選概念線", nickPh: "小美"
+      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰",
+      csvNote: "提醒：單元裡匯出的學習歷程 CSV 含有學號與姓名，請只透過課程平台繳交，不要貼到公開群組或公開連結。",
+      rmNotice: "已依你的系統設定「減少動態效果」關閉動畫：鏡頭點選時會直接切換，時鐘與角色暫停不動。",
+      rmHelp: "如果你的裝置開啟了「減少動態效果」，網站會自動關閉動畫，鏡頭改為直接切換。", filterTrails: "篩選概念線", nickPh: "小美"
     },
     en: {
       title: "Pangolin Strategy Trail", subtitle: "穿山甲策略步道・Pangolin University",
@@ -828,7 +838,10 @@ const DATA = {
       help3t: "Follow Lolo", help3d: "Press “Tour” for a guided walk through all ten zones; enrolled students can sign in via “Student” at the top right.",
       helpStart: "Start exploring", helpTour: "Follow Lolo",
       credit: "By Prof. Shihmin Lo (Dept. of International Business Studies, National Chi Nan University) · “Pangolin University” is fictional · Built with AI assistance · Videos connect to YouTube only when played",
-      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view", filterTrails: "Filter by link", nickPh: "Mei"
+      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view",
+      csvNote: "Reminder: the learning-record CSV exported from each unit contains your student ID and name. Submit it only through the course platform — never in public groups or public links.",
+      rmNotice: "Animations are off because your system has “Reduce motion” turned on: the camera jumps instead of flying, and the clock and characters stay still.",
+      rmHelp: "If your device has “Reduce motion” turned on, the site turns off animations and the camera jumps instead of flying.", filterTrails: "Filter by link", nickPh: "Mei"
     }
   }
 };
@@ -889,7 +902,8 @@ try {
   const simplex = new SimplexNoise({ random: rng });
   const isMobile = () => window.innerWidth <= 800;
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let reducedMotion = motionQuery.matches;
+  const forceReduce = qs.get("motion") === "reduce"; // ?motion=reduce：在任何裝置上預覽「減少動態效果」
+  let reducedMotion = motionQuery.matches || forceReduce;
   let dirty = true; // 需要重新繪製
 
   /* ---------- Renderer / Scene / Camera ---------- */
@@ -2525,7 +2539,7 @@ try {
   }
   function unitBlock(weeks) {
     if (!student) return `<div class="locked">${esc(tr("studentOnly"))}</div>`;
-    return `<div class="unit">${weeks.map((w) => `<a href="${esc(DATA.weeks[w].url)}" target="_blank" rel="noopener noreferrer">${esc(tr("openUnit"))} ${w}</a>`).join("")}</div>`;
+    return `<div class="unit">${weeks.map((w) => `<a href="${esc(DATA.weeks[w].url)}" target="_blank" rel="noopener noreferrer">${esc(tr("openUnit"))} ${w}</a>`).join("")}</div><div class="meta">${esc(tr("csvNote"))}</div>`;
   }
   function videoBlock(list) {
     if (!list.length) return "";
@@ -3083,7 +3097,22 @@ try {
   new ResizeObserver(resize).observe(app);
 
   /* ---------- reduced-motion ---------- */
-  motionQuery.addEventListener("change", (e) => { reducedMotion = e.matches; dirty = true; });
+  // 減少動態效果開啟時，畫面上方顯示一則說明（8 秒後收起）
+  const rmNote = document.getElementById("rmNote");
+  let rmTimer = 0;
+  function showRmNote() {
+    rmNote.hidden = false;
+    clearTimeout(rmTimer);
+    rmTimer = setTimeout(() => { rmNote.hidden = true; }, 8000);
+  }
+  if (reducedMotion) showRmNote();
+  document.body.classList.toggle("reduce-motion", reducedMotion);
+  motionQuery.addEventListener("change", (e) => {
+    reducedMotion = e.matches || forceReduce;
+    document.body.classList.toggle("reduce-motion", reducedMotion);
+    if (reducedMotion) showRmNote(); else rmNote.hidden = true;
+    dirty = true;
+  });
 
   /* ---------- 迴圈 ---------- */
   const timer = new THREE.Clock();
