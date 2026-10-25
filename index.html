@@ -190,7 +190,18 @@ body.sidebar-open #diary,body.sidebar-open #legend{right:350px}
 .tour-ctl #tourEnd{margin-left:auto}
 body.touring #card{max-height:calc(100vh - 144px - 250px)}
 #help{position:fixed;inset:0;z-index:28;display:grid;place-items:center;background:rgba(20,32,26,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:16px}
-#help[hidden]{display:none}
+#help[hidden],#castDlg[hidden]{display:none}
+#castDlg{position:fixed;inset:0;z-index:29;display:grid;place-items:center;background:rgba(20,32,26,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:16px}
+.cast-box{width:min(720px,100%)}
+#castList{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
+.cast-card{background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,42,20,.06);font-size:12px;line-height:1.55;scroll-margin:12px}
+.cast-card.lolo{grid-column:1/-1;display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
+.cast-card canvas{display:block;width:120px;height:120px;border-radius:14px;background:radial-gradient(circle at 50% 40%,#fff,#ece5d6);margin:0 auto 8px}
+.cast-card.lolo canvas{margin:0}
+.cast-card h3{margin:0;font-size:15px;color:var(--forest)}
+.cast-card .en-name{font-size:11px;color:#6a7368;margin-bottom:6px}
+.cast-card .k{display:block;font:700 9px ui-monospace,Consolas,monospace;letter-spacing:1.5px;color:#6a7368;text-transform:uppercase;margin-top:6px}
+.cast-card.flash{outline:3px solid var(--sun)}
 .help-box{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px 22px 20px;position:relative}
 .help-box h2{margin:6px 44px 6px 0;color:var(--forest)}
 .lang-pick{display:inline-flex;gap:4px;margin:10px 0 2px;padding:4px;border-radius:12px;background:#efe9dc}
@@ -358,13 +369,14 @@ body.reduce-motion .live-dot{animation:none}
     <div class="sep" aria-hidden="true"></div>
     <span id="presetBtns"></span>
     <div class="sep" aria-hidden="true"></div>
-    <button class="btn" id="pauseBtn" type="button" aria-pressed="false" data-i18n="pause">暫停</button>
-    <button class="btn" id="topBtn" type="button" aria-pressed="false" data-i18n="topView">俯瞰</button>
+    <button class="btn" id="pauseBtn" type="button" aria-pressed="false" data-i18n="pause" data-i18n-title="pauseTip">暫停</button>
+    <button class="btn" id="topBtn" type="button" aria-pressed="false" data-i18n="topView" data-i18n-title="topTip">俯瞰</button>
     <div class="sep" aria-hidden="true"></div>
-    <button class="btn" id="namesBtn" type="button" aria-pressed="false" data-i18n="names">角色名</button>
-    <button class="btn" id="packsBtn" type="button" aria-pressed="true" data-i18n="packs">背包</button>
-    <button class="btn" id="linesBtn" type="button" aria-pressed="false" data-i18n="lines">概念線</button>
-    <button class="btn" id="diaryBtn" type="button" aria-pressed="false" aria-controls="diary" data-i18n="diary">步道日記</button>
+    <button class="btn" id="namesBtn" type="button" aria-pressed="false" data-i18n="names" data-i18n-title="namesTip">動物名牌</button>
+    <button class="btn" id="packsBtn" type="button" aria-pressed="true" data-i18n="packs" data-i18n-title="packsTip">概念圖示</button>
+    <button class="btn" id="linesBtn" type="button" aria-pressed="false" data-i18n="lines" data-i18n-title="linesTip">概念線</button>
+    <button class="btn" id="diaryBtn" type="button" aria-pressed="false" aria-controls="diary" data-i18n="diary" data-i18n-title="diaryTip">步道日記</button>
+    <button class="btn" id="soundBtn" type="button" aria-pressed="false" data-i18n="sound" data-i18n-title="soundTip">聲音</button>
   </div>
 </div>
 
@@ -401,9 +413,21 @@ body.reduce-motion .live-dot{animation:none}
     <p class="credit" data-i18n="credit"></p>
     <p class="demo-links"><span data-i18n="demoLinks">簡報模式（教師用）</span>：<a href="?demo=1&amp;lang=zh">中文</a>｜<a href="?demo=1&amp;lang=en">English</a>｜<a href="?demo=1&amp;lang=both" data-i18n="demoBoth">中英並列</a></p>
     <div class="row">
+      <button class="btn ghost" id="helpCast" type="button" data-i18n="castBtn">角色圖鑑</button>
       <button class="btn ghost" id="helpStart" type="button" data-i18n="helpStart">開始探索</button>
       <button class="btn primary" id="helpTour" type="button" data-i18n="helpTour">跟著洛洛走</button>
     </div>
+  </div>
+</div>
+
+<!-- 角色圖鑑 -->
+<div id="castDlg" hidden>
+  <div class="panel help-box cast-box" role="dialog" aria-modal="true" aria-labelledby="castTitle">
+    <button class="close-x" id="castClose" type="button" aria-label="關閉" data-i18n-aria="close">×</button>
+    <div class="eyebrow">CAST</div>
+    <h2 id="castTitle" data-i18n="castTitle">角色圖鑑</h2>
+    <p class="muted" data-i18n="castSub"></p>
+    <div id="castList"></div>
   </div>
 </div>
 
@@ -437,6 +461,7 @@ const DATA = {
     title: { zh: "穿山甲策略步道", en: "Pangolin Strategy Trail" },
     world: { zh: "穿山甲大學", en: "Pangolin University" },
     guide: { zh: "洛洛", en: "Lolo" },
+    guideBio: { zh: "洛洛是一隻圍著紅圍巾的穿山甲，也是這條步道的導覽員。牠會帶你從大學入口一路爬到登頂觀景台，走完一學期的策略管理。", en: "Lolo is a pangolin in a red scarf and the guide of this trail, leading you from the University Gate up to the Summit Lookout through a semester of strategic management." },
     version: "0.1.0-M1"
   },
   // anchor：台地中心（世界座標 x,z）；radius：外接半徑；ground：頂面貼圖
@@ -757,12 +782,18 @@ const DATA = {
   ],
   // 角色（見 CONTENT 第 4 節）：active = 活動時段（分鐘，null 為全天）；nightExtra = 夜晚額外增加的數量
   cast: {
-    pangolin:  { name: { zh: "穿山甲", en: "Pangolin" },        speed: [0.32, 0.38], active: null,        nightExtra: 2 },
-    eagle:     { name: { zh: "大冠鷲", en: "Crested serpent eagle" }, speed: [0.34, 0.4], active: [360, 1020] },
-    magpie:    { name: { zh: "台灣藍鵲", en: "Taiwan blue magpie" }, speed: [0.36, 0.42], active: [360, 1020] },
-    wagtail:   { name: { zh: "白鶺鴒", en: "White wagtail" },  speed: [0.4, 0.46],  active: [360, 1020] },
-    hare:      { name: { zh: "野兔", en: "Hare" },              speed: [0.62, 0.7],  active: null },
-    partridge: { name: { zh: "竹雞", en: "Bamboo partridge" },  speed: [0.3, 0.34],  active: null }
+    pangolin:  { name: { zh: "穿山甲", en: "Pangolin" },        speed: [0.32, 0.38], active: null,        nightExtra: 2,
+      bio: { zh: "台灣穿山甲是夜行性的保育類動物，以螞蟻和白蟻為食，遇到危險會把身體捲成一顆球。", en: "The Formosan pangolin is a nocturnal, protected species that feeds on ants and termites and rolls into a ball when threatened." } },
+    eagle:     { name: { zh: "大冠鷲", en: "Crested serpent eagle" }, speed: [0.34, 0.4], active: [360, 1020],
+      bio: { zh: "大冠鷲是台灣中低海拔常見的猛禽，常在天空盤旋鳴叫，主要捕食蛇類。", en: "The crested serpent eagle is a common raptor of Taiwan’s lowlands and hills; it often circles overhead calling and mainly hunts snakes." } },
+    magpie:    { name: { zh: "台灣藍鵲", en: "Taiwan blue magpie" }, speed: [0.36, 0.42], active: [360, 1020],
+      bio: { zh: "台灣藍鵲是台灣特有種鳥類，紅喙、藍身、長尾，常成群活動，會互相幫忙照顧幼鳥。", en: "The Taiwan blue magpie is endemic to Taiwan — red bill, blue body, long tail. It moves in groups, and helpers assist in raising the chicks." } },
+    wagtail:   { name: { zh: "白鶺鴒", en: "White wagtail" },  speed: [0.4, 0.46],  active: [360, 1020],
+      bio: { zh: "白鶺鴒常在水邊和空曠地面活動，走路時尾巴會上下擺動，部分族群冬天會遷徙。", en: "The white wagtail forages near water and on open ground, wagging its tail as it walks; some populations migrate in winter." } },
+    hare:      { name: { zh: "野兔", en: "Hare" },              speed: [0.62, 0.7],  active: null,
+      bio: { zh: "台灣野兔多在清晨、黃昏與夜間活動，以草和嫩葉為食，奔跑速度很快。", en: "The Formosan hare is most active at dawn, dusk and night, eats grasses and tender leaves, and runs very fast." } },
+    partridge: { name: { zh: "竹雞", en: "Bamboo partridge" },  speed: [0.3, 0.34],  active: null,
+      bio: { zh: "台灣竹雞是台灣特有種，常成群在地面覓食，叫聲響亮，常被形容像「雞狗乖」。", en: "The Taiwan bamboo partridge is endemic to Taiwan; it forages on the ground in small groups and has a loud, well-known call." } }
   },
   // 固定在某區繞圈的角色（不搬運概念）
   ambient: [
@@ -772,6 +803,20 @@ const DATA = {
   ],
   // 白天在瞭望台上空盤旋的大冠鷲
   soaring: { zone: "Z04", count: 2, active: [360, 1020] },
+  // 合成配樂（Web Audio 即時合成，不載入音檔）：root = 主音（MIDI），mode = 大／小調五聲音階，
+  // wave = 音色，tempo = 旋律音的平均間隔（秒），wind = 風聲比例，lift = 旋律升高的八度
+  sound: {
+    Z01: { root: 60, mode: "major", wave: "triangle", tempo: 2.2, wind: 0.2, lift: 0 },
+    Z02: { root: 62, mode: "major", wave: "sine",     tempo: 1.8, wind: 0.1, lift: 0 },
+    Z03: { root: 65, mode: "major", wave: "triangle", tempo: 2.4, wind: 0.2, lift: 0 },
+    Z04: { root: 57, mode: "minor", wave: "sine",     tempo: 2.8, wind: 1.0, lift: 0 },
+    Z05: { root: 64, mode: "major", wave: "sine",     tempo: 2.0, wind: 0.1, lift: 12 },
+    Z06: { root: 55, mode: "major", wave: "triangle", tempo: 3.0, wind: 0.1, lift: 0 },
+    Z07: { root: 62, mode: "major", wave: "triangle", tempo: 1.2, wind: 0.4, lift: 0 },
+    Z08: { root: 65, mode: "major", wave: "triangle", tempo: 2.0, wind: 0.2, lift: 0 },
+    Z09: { root: 58, mode: "major", wave: "sine",     tempo: 1.8, wind: 0.5, lift: 0 },
+    Z10: { root: 60, mode: "major", wave: "sine",     tempo: 3.2, wind: 0.8, lift: 12 }
+  },
   // 溪流路徑（x,z），沿步道西側由山頂流到山腳
   stream: [[-1.8, -11.5], [-7.6, -7.4], [-8.4, -2.2], [-8.0, 3.2], [-9.0, 8.2], [-8.6, 12.6], [-7.0, 17.0]],
   dayCycle: {
@@ -803,7 +848,7 @@ const DATA = {
       loading: "洛洛正在穿上背包…", overview: "總覽", pause: "暫停", resume: "繼續",
       errTitle: "場景載入失敗。請確認網路連線，或改用支援 WebGL 的瀏覽器後重新整理。",
       lang: "EN", sceneLabel: "3D 步道場景", hudLabel: "時間",
-      names: "角色名", packs: "背包", lines: "概念線", carrying: "傳遞中：",
+      names: "動物名牌", packs: "概念圖示", lines: "概念線", carrying: "傳遞中：",
       legendTitle: "概念線", linkCase: "同一案例", linkConcept: "同一概念", linkExtend: "延伸思考",
       notice: "黃昏夜間，校園減速慢行",
       list: "清單", diary: "步道日記", close: "關閉", search: "搜尋區塊、細項或概念…", tabZones: "步道區塊", tabTrails: "概念線",
@@ -825,6 +870,12 @@ const DATA = {
       helpStart: "開始探索", helpTour: "跟著洛洛走",
       credit: "作者：駱世民教授（國立暨南國際大學國際企業學系）・「穿山甲大學」為虛構世界・AI 協作開發・播放影片時才會連線到 YouTube",
       dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰", demoLinks: "簡報模式（教師用）", demoBoth: "中英並列",
+      namesTip: "鏡頭拉近時，在動物頭上顯示名牌與正在傳遞的概念", packsTip: "鏡頭拉近時，在動物頭上顯示所背概念的小圖示",
+      linesTip: "顯示所有概念線（區塊之間概念的關聯）", diaryTip: "記錄動物出發、抵達的即時紀錄", topTip: "從正上方俯瞰整條步道",
+      pauseTip: "暫停或繼續時間流動", soundTip: "開啟或關閉配樂與環境音（預設關閉）",
+      sound: "聲音", castBtn: "角色圖鑑", castTitle: "角色圖鑑", castSub: "步道上的動物夥伴，以及牠們負責傳遞的概念。",
+      castLinks: "負責的概念線", castZones: "常出沒的區塊", castActive: "活動時段", allDay: "全天", dayTime: "白天 06:00–17:00", nightExtra: "夜晚另有夜行的穿山甲加入",
+      castGuide: "主角・導覽員", castNone: "不負責概念線，在區塊裡散步",
       csvNote: "提醒：單元裡匯出的學習歷程 CSV 含有學號與姓名，請只透過課程平台繳交，不要貼到公開群組或公開連結。",
       rmNotice: "已依你的系統設定「減少動態效果」關閉動畫：鏡頭點選時會直接切換，時鐘與角色暫停不動。",
       rmHelp: "如果你的裝置開啟了「減少動態效果」，網站會自動關閉動畫，鏡頭改為直接切換。", filterTrails: "篩選概念線", nickPh: "小美"
@@ -834,7 +885,7 @@ const DATA = {
       loading: "Lolo is putting on the backpack…", overview: "Overview", pause: "Pause", resume: "Resume",
       errTitle: "The scene failed to load. Please check your connection or use a WebGL-capable browser, then reload.",
       lang: "中", sceneLabel: "3D trail scene", hudLabel: "Time",
-      names: "Names", packs: "Packs", lines: "Links", carrying: "Delivering: ",
+      names: "Name tags", packs: "Concept icons", lines: "Links", carrying: "Delivering: ",
       legendTitle: "Concept links", linkCase: "Same case", linkConcept: "Shared concept", linkExtend: "Extension",
       notice: "Dusk and night: please slow down on campus",
       list: "List", diary: "Trail log", close: "Close", search: "Search zones, topics or concepts…", tabZones: "Zones", tabTrails: "Links",
@@ -856,6 +907,12 @@ const DATA = {
       helpStart: "Start exploring", helpTour: "Follow Lolo",
       credit: "By Prof. Shihmin Lo (Dept. of International Business Studies, National Chi Nan University) · “Pangolin University” is fictional · Built with AI assistance · Videos connect to YouTube only when played",
       dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view", demoLinks: "Presentation mode (for instructors)", demoBoth: "Bilingual",
+      namesTip: "When zoomed in, show a name tag and the concept each animal is delivering", packsTip: "When zoomed in, show a small icon of the concept each animal carries",
+      linesTip: "Show all concept links (how ideas connect across zones)", diaryTip: "A live log of animals departing and arriving", topTip: "View the whole trail from above",
+      pauseTip: "Pause or resume the flow of time", soundTip: "Turn music and ambient sound on or off (off by default)",
+      sound: "Sound", castBtn: "Character guide", castTitle: "Character guide", castSub: "The animal companions on the trail and the concepts they deliver.",
+      castLinks: "Concept links", castZones: "Usual zones", castActive: "Active hours", allDay: "All day", dayTime: "Daytime 06:00–17:00", nightExtra: "Extra nocturnal pangolins join at night",
+      castGuide: "Main character · guide", castNone: "No concept links — strolls around the zone",
       csvNote: "Reminder: the learning-record CSV exported from each unit contains your student ID and name. Submit it only through the course platform — never in public groups or public links.",
       rmNotice: "Animations are off because your system has “Reduce motion” turned on: the camera jumps instead of flying, and the clock and characters stay still.",
       rmHelp: "If your device has “Reduce motion” turned on, the site turns off animations and the camera jumps instead of flying.", filterTrails: "Filter by link", nickPh: "Mei"
@@ -1824,7 +1881,7 @@ try {
 
   /* ---------- 背景樹（數千棵 InstancedMesh，不投影） ---------- */
   function withColor(geo, hex) {
-    const g = geo.toNonIndexed();
+    const g = geo.index ? geo.toNonIndexed() : geo; // 二十面體本來就是非索引幾何
     const c = new THREE.Color(hex);
     const arr = new Float32Array(g.attributes.position.count * 3);
     for (let i = 0; i < arr.length; i += 3) { arr[i] = c.r; arr[i + 1] = c.g; arr[i + 2] = c.b; }
@@ -2626,7 +2683,7 @@ try {
       if (sel.walker) h += `<div class="tagline"><b>${esc(pick(DATA.cast[sel.walker.species].name))}</b>・${esc(tr("walkerOn"))}</div>`;
       h += `<div class="sec"><div class="sec-title">${esc(tr("from"))}</div>${itemButton(itemById.get(t.from))}</div>`;
       h += `<div class="sec"><div class="sec-title">${esc(tr("to"))}</div>${itemButton(itemById.get(t.to))}</div>`;
-      h += `<div class="sec"><div class="sec-title">${esc(tr("carriedBy"))}</div><div class="chips"><span class="chip" style="cursor:default">${esc(pick(DATA.cast[t.walker].name))}</span></div></div>`;
+      h += `<div class="sec"><div class="sec-title">${esc(tr("carriedBy"))}</div><div class="chips"><button class="chip" data-cast="${t.walker}">${esc(pick(DATA.cast[t.walker].name))} →</button></div></div>`;
     }
     cardBody.innerHTML = h;
     cardBody.querySelectorAll(".vid canvas").forEach(drawVideoPreview);
@@ -2638,7 +2695,9 @@ try {
     const b = e.target.closest("[data-sel]");
     if (b) { const [type, id] = b.dataset.sel.split(":"); select(type, id); return; }
     const v = e.target.closest("[data-video]");
-    if (v) playVideo(v, v.dataset.video);
+    if (v) { playVideo(v, v.dataset.video); return; }
+    const c = e.target.closest("[data-cast]");
+    if (c) openCast(c.dataset.cast);
   });
   document.getElementById("cardClose").addEventListener("click", closeCard);
 
@@ -2682,18 +2741,20 @@ try {
   /* ---------- 細項縮圖：160² 離屏渲染 ---------- */
   let thumbR = null, thumbScene = null, thumbCam = null;
   const thumbCache = new Map();
+  function ensureThumb() {
+    if (thumbR) return;
+    thumbR = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    thumbR.setPixelRatio(2); thumbR.setSize(160, 160, false);
+    thumbR.outputColorSpace = THREE.SRGBColorSpace; thumbR.toneMapping = THREE.ACESFilmicToneMapping;
+    thumbScene = new THREE.Scene();
+    thumbScene.add(new THREE.HemisphereLight(0xffffff, 0x8f8270, 1.6));
+    const d = new THREE.DirectionalLight(0xfff3e0, 2.2); d.position.set(2, 4, 3); thumbScene.add(d);
+    thumbCam = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
+    thumbCam.position.set(1.7, 1.6, 2.3); thumbCam.lookAt(0, 0.42, 0);
+  }
   function drawThumb(cv, it) {
     try {
-      if (!thumbR) {
-        thumbR = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-        thumbR.setPixelRatio(2); thumbR.setSize(160, 160, false);
-        thumbR.outputColorSpace = THREE.SRGBColorSpace; thumbR.toneMapping = THREE.ACESFilmicToneMapping;
-        thumbScene = new THREE.Scene();
-        thumbScene.add(new THREE.HemisphereLight(0xffffff, 0x8f8270, 1.6));
-        const d = new THREE.DirectionalLight(0xfff3e0, 2.2); d.position.set(2, 4, 3); thumbScene.add(d);
-        thumbCam = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
-        thumbCam.position.set(1.7, 1.6, 2.3); thumbCam.lookAt(0, 0.42, 0);
-      }
+      ensureThumb();
       if (!thumbCache.has(it.model)) {
         captureParts = [];
         MODELS[it.model](new THREE.Matrix4());
@@ -2957,6 +3018,175 @@ try {
   document.getElementById("helpTour").addEventListener("click", () => { closeHelp(); startTour(); });
   helpEl.addEventListener("click", (e) => { if (e.target === helpEl) closeHelp(); });
 
+  /* ---------- 角色圖鑑 ---------- */
+  const castDlg = document.getElementById("castDlg"), castList = document.getElementById("castList");
+  let castCam = null;
+  function drawCastThumb(cv, species, lolo) {
+    try {
+      ensureThumb();
+      if (!castCam) { castCam = new THREE.PerspectiveCamera(30, 1, 0.1, 20); castCam.position.set(0.9, 0.95, 2.5); castCam.lookAt(0, 0.52, 0); }
+      const key = "cast:" + species + (lolo ? ":lolo" : "");
+      if (!thumbCache.has(key)) {
+        const parts = chibi(species);
+        if (lolo) addLoloScarf(parts);
+        const grp = new THREE.Group();
+        parts.forEach((p) => {
+          const m = new THREE.Mesh(charGeos[p.g], new THREE.MeshStandardMaterial({ color: p.c, roughness: 0.75 }));
+          m.applyMatrix4(L(p.p[0], p.p[1], p.p[2], p.s[0], p.s[1], p.s[2], p.r[0], p.r[1], p.r[2]));
+          grp.add(m);
+        });
+        grp.rotation.y = -0.45;
+        thumbCache.set(key, grp);
+      }
+      thumbScene.children.filter((c) => c.isGroup).forEach((c) => thumbScene.remove(c));
+      thumbScene.add(thumbCache.get(key));
+      thumbR.render(thumbScene, castCam);
+      cv.getContext("2d").drawImage(thumbR.domElement, 0, 0, cv.width, cv.height);
+    } catch (err) { console.warn(err); }
+  }
+  function castInfo(sp) {
+    const trails = DATA.trails.filter((t) => t.walker === sp);
+    const zones = new Set();
+    trails.forEach((t) => { zones.add(itemById.get(t.from).zone); zones.add(itemById.get(t.to).zone); });
+    DATA.ambient.filter((a) => a.walker === sp && !a.lolo).forEach((a) => zones.add(a.zone));
+    if (sp === "eagle") zones.add(DATA.soaring.zone);
+    return { trails, zones: [...zones].sort() };
+  }
+  function renderCast() {
+    const zoneNames = (ids) => ids.map((z) => `${z} ${esc(pick(zoneById.get(z).name))}`).join("、");
+    let h = `<div class="cast-card lolo" id="cast-lolo"><canvas width="240" height="240" data-sp="pangolin" data-lolo="1"></canvas><div>
+      <h3>${esc(pick(DATA.meta.guide))}</h3><div class="en-name">${esc(tr("castGuide"))}</div>
+      <div>${esc(pick(DATA.meta.guideBio))}</div>
+      <span class="k">${esc(tr("castZones"))}</span>${zoneNames(["Z01"])}</div></div>`;
+    Object.entries(DATA.cast).forEach(([sp, c]) => {
+      const info = castInfo(sp);
+      const active = c.active ? tr("dayTime") : tr("allDay");
+      h += `<div class="cast-card" id="cast-${sp}"><canvas width="240" height="240" data-sp="${sp}"></canvas>
+        <h3>${esc(c.name.zh)}</h3><div class="en-name">${esc(c.name.en)}</div>
+        <div>${esc(pick(c.bio))}</div>
+        <span class="k">${esc(tr("castLinks"))}</span>${info.trails.length ? [...new Set(info.trails.map((t) => pick(t.label)))].map(esc).join("、") : esc(tr("castNone"))}
+        <span class="k">${esc(tr("castZones"))}</span>${zoneNames(info.zones)}
+        <span class="k">${esc(tr("castActive"))}</span>${esc(active)}${c.nightExtra ? `；${esc(tr("nightExtra"))}` : ""}</div>`;
+    });
+    castList.innerHTML = h;
+    castList.querySelectorAll("canvas").forEach((cv) => drawCastThumb(cv, cv.dataset.sp, !!cv.dataset.lolo));
+  }
+  function openCast(focus) {
+    castDlg.hidden = false;
+    renderCast();
+    document.getElementById("castClose").focus();
+    if (focus) {
+      const card = document.getElementById("cast-" + focus);
+      if (card) { card.scrollIntoView({ block: "center", behavior: reducedMotion ? "auto" : "smooth" }); card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1600); }
+    }
+  }
+  function closeCast() { castDlg.hidden = true; }
+  document.getElementById("helpCast").addEventListener("click", () => { closeHelp(); openCast(); });
+  document.getElementById("castClose").addEventListener("click", closeCast);
+  castDlg.addEventListener("click", (e) => { if (e.target === castDlg) closeCast(); });
+
+  /* ---------- 合成配樂（Web Audio，預設關閉，不載入任何音檔） ---------- */
+  const SCALES = { major: [0, 2, 4, 7, 9], minor: [0, 3, 5, 7, 10] };
+  const midiHz = (n) => 440 * Math.pow(2, (n - 69) / 12);
+  const arng = mulberry32(31); // 配樂專用亂數，不影響場景
+  const audio = { ctx: null, on: false, master: null, filter: null, pads: [], windGain: null, zone: null, cfg: null, nextNote: 0, nextAmb: 0 };
+  function initAudio() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    const ctx = new AC();
+    audio.ctx = ctx;
+    audio.master = ctx.createGain(); audio.master.gain.value = 0; audio.master.connect(ctx.destination);
+    // 底層和聲：三個振盪器經過緩慢變化的低通濾波
+    audio.filter = ctx.createBiquadFilter(); audio.filter.type = "lowpass"; audio.filter.frequency.value = 900; audio.filter.Q.value = 0.6;
+    const padGain = ctx.createGain(); padGain.gain.value = 0.09;
+    audio.filter.connect(padGain); padGain.connect(audio.master);
+    const lfo = ctx.createOscillator(), lfoG = ctx.createGain();
+    lfo.frequency.value = 0.07; lfoG.gain.value = 320; lfo.connect(lfoG); lfoG.connect(audio.filter.frequency); lfo.start();
+    for (let i = 0; i < 3; i++) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "triangle"; g.gain.value = i === 0 ? 0.5 : 0.32;
+      o.connect(g); g.connect(audio.filter); o.start();
+      audio.pads.push(o);
+    }
+    // 風聲：濾波後的雜訊，頻帶緩慢飄移
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = arng() * 2 - 1;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 500; bp.Q.value = 0.7;
+    audio.windGain = ctx.createGain(); audio.windGain.gain.value = 0;
+    src.connect(bp); bp.connect(audio.windGain); audio.windGain.connect(audio.master); src.start();
+    const wl = ctx.createOscillator(), wlg = ctx.createGain();
+    wl.frequency.value = 0.11; wlg.gain.value = 180; wl.connect(wlg); wlg.connect(bp.frequency); wl.start();
+    return true;
+  }
+  // 切換區塊：和聲平滑滑到新的調性，風聲跟著調整
+  function soundZone(zid) {
+    const cfg = DATA.sound[zid];
+    if (!cfg || !audio.ctx) return;
+    audio.zone = zid; audio.cfg = cfg;
+    const t = audio.ctx.currentTime;
+    const third = cfg.mode === "minor" ? 3 : 4;
+    [cfg.root - 12, cfg.root - 5, cfg.root + third].forEach((n, i) => {
+      audio.pads[i].type = cfg.wave;
+      audio.pads[i].frequency.setTargetAtTime(midiHz(n), t, 0.8);
+    });
+    audio.windGain.gain.setTargetAtTime(cfg.wind * 0.045, t, 1.2);
+  }
+  function tone(freq, start, dur, peak, type) {
+    const ctx = audio.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g); g.connect(audio.master); o.start(start); o.stop(start + dur + 0.05);
+    return o;
+  }
+  function birdChirp(t) {
+    const n = 2 + Math.floor(arng() * 3), base = 2600 + arng() * 1200;
+    for (let k = 0; k < n; k++) {
+      const s = t + k * 0.11, o = tone(base, s, 0.09, 0.025, "sine");
+      o.frequency.setValueAtTime(base, s); o.frequency.exponentialRampToValueAtTime(base * 1.35, s + 0.07);
+    }
+  }
+  function cricket(t) {
+    for (let k = 0; k < 6; k++) tone(4300 + arng() * 300, t + k * 0.045, 0.03, 0.008, "sine");
+  }
+  function updateSound() {
+    if (!audio.on || !audio.ctx || audio.ctx.state !== "running") return;
+    // 目前所在區塊：選取的區塊，否則取鏡頭目標最近的區塊
+    let zid = selectedZone;
+    if (!zid) {
+      let best = Infinity;
+      terraces.forEach((t) => { const d = Math.hypot(t.center.x - controls.target.x, t.center.z - controls.target.z); if (d < best) { best = d; zid = t.zone.id; } });
+    }
+    if (zid !== audio.zone) soundZone(zid);
+    const now = audio.ctx.currentTime, cfg = audio.cfg;
+    if (now >= audio.nextNote) {
+      const sc = SCALES[cfg.mode], deg = sc[Math.floor(arng() * sc.length)] + (arng() < 0.3 ? 12 : 0);
+      tone(midiHz(cfg.root + deg + cfg.lift), now + 0.02, 1.8, 0.07, cfg.wave === "sine" ? "sine" : "triangle");
+      audio.nextNote = now + cfg.tempo * (0.6 + arng() * 0.9);
+    }
+    if (now >= audio.nextAmb) {
+      if (night < 0.5) { birdChirp(now + 0.05); audio.nextAmb = now + 2.5 + arng() * 4; }
+      else { cricket(now + 0.05); audio.nextAmb = now + 0.8 + arng() * 1.4; }
+    }
+  }
+  const soundBtn = document.getElementById("soundBtn");
+  function setSound(on) {
+    if (on && !audio.ctx && !initAudio()) return;
+    audio.on = on;
+    soundBtn.setAttribute("aria-pressed", String(on));
+    if (!audio.ctx) return;
+    const t = audio.ctx.currentTime;
+    if (on) { audio.ctx.resume(); audio.zone = null; audio.master.gain.setTargetAtTime(0.7, t, 0.6); }
+    else audio.master.gain.setTargetAtTime(0, t, 0.25);
+  }
+  soundBtn.addEventListener("click", () => setSound(!audio.on));
+  document.addEventListener("visibilitychange", () => {
+    if (!audio.ctx) return;
+    if (document.hidden) audio.ctx.suspend(); else if (audio.on) audio.ctx.resume();
+  });
+
   /* ---------- 手機版：HUD 收進「時間」按鈕 ---------- */
   const hudEl = document.getElementById("hud");
   document.getElementById("timeBtn").addEventListener("click", () => {
@@ -3011,6 +3241,7 @@ try {
   window.addEventListener("keydown", (e) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
     if (e.key === "Escape") {
+      if (!castDlg.hidden) return closeCast();
       if (!helpEl.hidden) return closeHelp();
       if (!gateEl.hidden) return closeGate();
       if (tour.on) endTour();
@@ -3036,6 +3267,8 @@ try {
     hint.hidden = false;
     setTimeout(() => { hint.style.opacity = "0"; setTimeout(() => { hint.hidden = true; }, 1000); }, 4000);
     setTimeout(() => startTour(true), 600);
+    // 瀏覽器要求先有使用者操作才能出聲：簡報時第一次點擊畫面就開啟配樂
+    document.addEventListener("pointerdown", () => { if (!audio.on) setSound(true); }, { once: true });
   } else if (!store.get("onboarded")) {
     openHelp();
   }
@@ -3121,6 +3354,7 @@ try {
     if (!diaryEl.hidden) renderDiary();
     if (sel.type) renderCard();
     if (tour.on) renderTour();
+    if (!castDlg.hidden) renderCast();
     searchBox.placeholder = tr("search");
     pins.forEach((p, id) => p.el.setAttribute("aria-label", pick(itemById.get(id).name)));
   }
@@ -3194,6 +3428,7 @@ try {
     if (kitMeshes.small[0] && kitMeshes.small[0].visible !== showSmall) { kitMeshes.small.forEach((m) => { m.visible = showSmall; }); dirty = true; }
     updateWalkers(dt, animate, camDist);
     updateTour();
+    updateSound();
     const compact = window.innerWidth <= 800 && camDist > 26;
     if (compact !== document.body.classList.contains("compact-labels")) document.body.classList.toggle("compact-labels", compact);
 
