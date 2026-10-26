@@ -70,6 +70,7 @@ body{background:radial-gradient(circle at 50% 30%,#f7f4ec,#dfe6d6);font-family:v
 #notice.show{opacity:1;transform:none}
 .walker-tag{pointer-events:none;padding:3px 8px;border-radius:999px;background:rgba(251,248,241,.92);border:1px solid rgba(0,64,48,.18);
   font:600 11px var(--font);color:var(--ink);white-space:nowrap;box-shadow:0 2px 6px rgba(31,36,33,.12);transform:translateY(-6px)}
+.walker-tag.lolo{border-color:#c8463c;border-width:1.5px}
 
 /* ---------- 面板共用 ---------- */
 .panel{background:var(--cream);border-radius:22px;box-shadow:0 1px 2px rgba(31,36,33,.06),0 8px 24px rgba(31,36,33,.10),0 24px 60px rgba(31,36,33,.08);z-index:8}
@@ -385,7 +386,7 @@ body.reduce-motion .live-dot{animation:none}
     <button class="btn" id="pauseBtn" type="button" aria-pressed="false" data-i18n="pause" data-i18n-title="pauseTip">暫停</button>
     <button class="btn" id="topBtn" type="button" aria-pressed="false" data-i18n="topView" data-i18n-title="topTip">俯瞰</button>
     <div class="sep" aria-hidden="true"></div>
-    <button class="btn" id="namesBtn" type="button" aria-pressed="false" data-i18n="names" data-i18n-title="namesTip">動物名牌</button>
+    <button class="btn" id="namesBtn" type="button" aria-pressed="false" data-i18n-title="namesTip">動物名牌</button>
     <button class="btn" id="packsBtn" type="button" aria-pressed="true" data-i18n="packs" data-i18n-title="packsTip">概念圖示</button>
     <button class="btn" id="linesBtn" type="button" aria-pressed="false" data-i18n="lines" data-i18n-title="linesTip">概念線</button>
     <button class="btn" id="diaryBtn" type="button" aria-pressed="false" aria-controls="diary" data-i18n="diary" data-i18n-title="diaryTip">步道日記</button>
@@ -909,11 +910,11 @@ const DATA = {
       gZoneT: "步道區塊與細項", gZoneD: "10 片台地對應 16 週課程，從山腳的大學入口一路爬到山頂。台地上每個小模型是一個「細項」（子主題），點選可以看到白話說明、重點與預習影片。",
       gLinkT: "概念線", gLinkD: "同一個案例或概念在不同週再次出現時，就用一條線把兩個細項連起來，讓你看見前後週的關聯。線型代表連結的類型：",
       gIconT: "概念圖示", gIconD: "動物頭上的小圓圖示，代表牠正在傳遞的概念（鏡頭拉近時才顯示）：",
-      gTagT: "動物名牌", gTagD: "打開「動物名牌」後，鏡頭拉近時動物頭上會出現「誰在傳遞什麼」，例如「穿山甲｜傳遞中：互補資產」。背著概念的動物會在兩個細項之間來回走，到站停一下代表交接。",
+      gTagT: "動物名牌", gTagD: "「動物名牌」按一下切換三種：關閉 → 名字（只顯示動物名，例如「洛洛」「竹雞」）→ 完整（再加上正在傳遞的概念，例如「穿山甲｜傳遞中：互補資產」）。鏡頭拉近時才會出現。背著概念的動物會在兩個細項之間來回走，到站停一下代表交接；導覽時洛洛的名牌一律顯示。",
       gDiaryT: "步道日記", gDiaryD: "即時記錄背著概念的動物何時出發、何時抵達（使用畫面上的時間）。可以只看抵達，或只看目前選取的區塊、細項、概念線的相關紀錄。",
       gSoundT: "聲音", gSoundD: "以瀏覽器即時合成，不載入任何音檔。每個區塊有不同的調性與音色；清晨鳥鳴最多、白天旋律正常、黃昏音色轉暖放慢、夜晚以蟲鳴為主。預設關閉。",
       castRolesT: "角色分工", castRolesD: "穿山甲負責多數案例與核心概念（台積電、HTC、鴻海、價值鏈…）；野兔跑得快，負責創新與速度相關的概念；台灣藍鵲成群合作，負責網路效應與策略聯盟；白鶺鴒會遷徙，負責海外進入模式；大冠鷲在高空俯瞰，負責企業範疇；竹雞負責實質選擇權與假說驗證。洛洛則沿著整條步道，帶你走完一學期。", loloRoute: "整條步道：從 Z01 大學入口走到 Z10 登頂觀景台，再走回來", diarySel: "目前選取的區塊／細項／概念線", diaryNeedSel: "先點選一個區塊、細項或概念線，這裡會只顯示相關紀錄。",
-      namesTip: "鏡頭拉近時，在動物頭上顯示名牌與正在傳遞的概念", packsTip: "鏡頭拉近時，在動物頭上顯示所背概念的小圖示",
+      namesTip: "按一下切換：關閉／名字／完整（名字＋正在傳遞的概念）；鏡頭拉近時顯示", namesName: "名字", namesFull: "完整", loloRole: "導覽員", packsTip: "鏡頭拉近時，在動物頭上顯示所背概念的小圖示",
       linesTip: "顯示所有概念線（區塊之間概念的關聯）", diaryTip: "記錄動物出發、抵達的即時紀錄", topTip: "從正上方俯瞰整條步道",
       pauseTip: "暫停或繼續時間流動", soundTip: "開啟或關閉配樂與環境音（預設關閉）",
       sound: "聲音", castBtn: "角色圖鑑", castTitle: "角色圖鑑", castSub: "步道上的動物夥伴，以及牠們負責傳遞的概念。",
@@ -953,11 +954,11 @@ const DATA = {
       gZoneT: "Zones and topics", gZoneD: "Ten terraces map the 16-week course, climbing from the University Gate at the foot of the hill to the summit. Each small model on a terrace is a topic; tap it for a plain-language summary, key points and preview videos.",
       gLinkT: "Concept links", gLinkD: "When the same case or concept reappears in another week, a line connects the two topics so you can see how the weeks build on each other. The line style shows the type of link:",
       gIconT: "Concept icons", gIconD: "The small round icon above an animal shows the concept it is delivering (visible when zoomed in):",
-      gTagT: "Name tags", gTagD: "Turn on “Name tags” and, when zoomed in, each animal shows who it is and what it is delivering, e.g. “Pangolin | Delivering: Complementary assets”. Animals carrying concepts walk back and forth between two topics; a short stop means a handoff.",
+      gTagT: "Name tags", gTagD: "Click “Name tags” to cycle through Off → Names (just the animal, e.g. “Lolo”, “Partridge”) → Full (plus the concept it is delivering, e.g. “Pangolin | Delivering: Complementary assets”). Tags appear when zoomed in. Animals carrying concepts walk back and forth between two topics; a short stop means a handoff. During the tour, Lolo’s tag is always shown.",
       gDiaryT: "Trail log", gDiaryD: "A live record of when concept-carrying animals depart and arrive (using the on-screen clock). You can show arrivals only, or only entries related to the selected zone, topic or link.",
       gSoundT: "Sound", gSoundD: "Synthesized live in the browser with no audio files. Each zone has its own key and timbre; dawn has the most birdsong, daytime normal melodies, dusk warmer and slower tones, and night mostly insects. Off by default.",
       castRolesT: "Who carries what", castRolesD: "Pangolins carry most cases and core concepts (TSMC, HTC, Foxconn, value chain…); hares are fast and carry innovation- and speed-related ideas; Taiwan blue magpies work in groups and carry network effects and alliances; white wagtails migrate and carry foreign entry modes; the soaring eagle carries corporate scope; the bamboo partridge carries real options and hypothesis testing. Lolo walks the whole trail with you through the semester.", loloRoute: "The whole trail: from Z01 University Gate up to Z10 Summit Lookout and back", diarySel: "Current selection (zone / topic / link)", diaryNeedSel: "Select a zone, topic or link first — the log will then show only related entries.",
-      namesTip: "When zoomed in, show a name tag and the concept each animal is delivering", packsTip: "When zoomed in, show a small icon of the concept each animal carries",
+      namesTip: "Click to cycle: Off / Names / Full (name + concept being delivered); shown when zoomed in", namesName: "Names", namesFull: "Full", loloRole: "Trail guide", packsTip: "When zoomed in, show a small icon of the concept each animal carries",
       linesTip: "Show all concept links (how ideas connect across zones)", diaryTip: "A live log of animals departing and arriving", topTip: "View the whole trail from above",
       pauseTip: "Pause or resume the flow of time", soundTip: "Turn music and ambient sound on or off (off by default)",
       sound: "Sound", castBtn: "Character guide", castTitle: "Character guide", castSub: "The animal companions on the trail and the concepts they deliver.",
@@ -2228,6 +2229,22 @@ try {
   });
   const soarZone = terraces.find((t) => t.zone.id === DATA.soaring.zone);
   for (let k = 0; k < DATA.soaring.count; k++) spawn({ species: "eagle", soar: true, soarPhase: (k / DATA.soaring.count) * Math.PI * 2, soarR: 2.2 + k * 0.7, soarH: soarZone.top + 3.2 + k * 0.6, active: DATA.soaring.active });
+  // 導覽時洛洛走到目前站點：預先算出每區在洛洛路線上、最接近台地中心的位置
+  const lolo = walkers.find((w) => w.lolo);
+  const loloStop = new Map();
+  const loloGo = { s: null, speed: 1 };
+  if (lolo) terraces.forEach((t) => {
+    let best = Infinity;
+    lolo.path.pts.forEach((p, i) => {
+      const d = Math.hypot(p.x - t.center.x, p.z - t.center.z) + Math.abs(p.y - t.top) * 4;
+      if (d < best) { best = d; loloStop.set(t.zone.id, lolo.path.cum[i]); }
+    });
+  });
+  function loloWalkTo(zid) {
+    if (!lolo || !loloStop.has(zid)) return;
+    loloGo.s = loloStop.get(zid);
+    loloGo.speed = Math.max(1.2, Math.abs(loloGo.s - lolo.s) / 3); // 約 3 秒內走到，導覽每站 8 秒
+  }
 
   const charMat = new THREE.MeshStandardMaterial({ roughness: 0.75, metalness: 0 });
   const charMeshes = {};
@@ -2305,13 +2322,14 @@ try {
     return m;
   }
   walkers.forEach((w) => {
-    if (!w.trail) return;
-    w.badge = new THREE.Sprite(badgeMat(w.trail.carry));
-    w.badge.scale.set(0.2, 0.2, 1);
-    w.badge.visible = false;
-    w.badge.renderOrder = 3;
-    scene.add(w.badge);
-    // 角色名牌（「傳遞中：…」）
+    if (w.trail) {
+      w.badge = new THREE.Sprite(badgeMat(w.trail.carry));
+      w.badge.scale.set(0.2, 0.2, 1);
+      w.badge.visible = false;
+      w.badge.renderOrder = 3;
+      scene.add(w.badge);
+    }
+    // 角色名牌：每隻動物都有；「完整」時，背概念的動物另加「傳遞中：…」
     const el = document.createElement("div");
     el.className = "walker-tag";
     w.tagEl = el;
@@ -2320,9 +2338,14 @@ try {
     scene.add(w.tag);
   });
   function renderWalkerTags() {
-    walkers.forEach((w) => { if (w.tagEl) w.tagEl.textContent = `${pick(DATA.cast[w.species].name)}｜${tr("carrying")}${pick(w.trail.label)}`; });
+    walkers.forEach((w) => {
+      const name = w.lolo ? pick(DATA.meta.guide) : pick(DATA.cast[w.species].name);
+      let extra = "";
+      if (toggles.names === "full") extra = w.trail ? `${tr("carrying")}${pick(w.trail.label)}` : w.lolo ? tr("loloRole") : "";
+      w.tagEl.textContent = extra ? `${name}${lang === "en" ? " | " : "｜"}${extra}` : name;
+      w.tagEl.classList.toggle("lolo", !!w.lolo);
+    });
   }
-  renderWalkerTags();
 
   /* ---------- 概念線（沿路網的管狀線，實線／虛線／點線，圖樣流動） ---------- */
   const lineUniformTime = { value: 0 };
@@ -2363,7 +2386,9 @@ try {
   });
 
   /* ---------- HUD 開關：角色名、背包、概念線 ---------- */
-  const toggles = { names: false, packs: true, lines: false };
+  // names：off／name／full 三段切換；packs、lines 為開關
+  const toggles = { names: "off", packs: true, lines: false };
+  const NAME_MODES = ["off", "name", "full"];
   const legendEl = document.getElementById("legend");
   function setToggle(key, on) {
     toggles[key] = on;
@@ -2371,7 +2396,20 @@ try {
     if (key === "lines") showRelatedLines(); // 開關打開顯示全部；關閉時只留與選取相關的線
     dirty = true;
   }
-  ["names", "packs", "lines"].forEach((k) => document.getElementById(k + "Btn").addEventListener("click", () => setToggle(k, !toggles[k])));
+  function renderNamesBtn() {
+    const m = toggles.names;
+    const b = document.getElementById("namesBtn");
+    b.textContent = m === "off" ? tr("names") : `${tr("names")}${lang === "en" ? ": " : "："}${tr(m === "name" ? "namesName" : "namesFull")}`;
+    b.setAttribute("aria-pressed", String(m !== "off"));
+  }
+  function setNames(mode) {
+    toggles.names = mode;
+    renderNamesBtn(); renderWalkerTags();
+    dirty = true;
+  }
+  ["packs", "lines"].forEach((k) => document.getElementById(k + "Btn").addEventListener("click", () => setToggle(k, !toggles[k])));
+  document.getElementById("namesBtn").addEventListener("click", () => setNames(NAME_MODES[(NAME_MODES.indexOf(toggles.names) + 1) % NAME_MODES.length]));
+  renderNamesBtn(); renderWalkerTags();
 
   /* ---------- 每幀更新角色 ---------- */
   const noticeEl = document.getElementById("notice");
@@ -2403,7 +2441,14 @@ try {
         w.fwd.set(-Math.sin(a), 0, Math.cos(a));
         flap = Math.sin(walkerTime * 5 + w.soarPhase * 3) * 0.35;
       } else {
-        if (animate) {
+        const touring = w.lolo && loloGo.s !== null;
+        if (touring) {
+          // 導覽中：洛洛走向目前站點，到了就停下來面向鏡頭
+          const d = loloGo.s - w.s;
+          w.pause = 0;
+          if (!animate) w.s = loloGo.s;
+          else if (Math.abs(d) > 1e-3) { w.dir = Math.sign(d); w.s += w.dir * Math.min(Math.abs(d), loloGo.speed * dt); walking = true; }
+        } else if (animate) {
           if (w.pause > 0) {
             w.pause -= dt;
             if (w.pause <= 0 && w.trail) onWalkerDepart(w); // 交接完畢，折返出發
@@ -2421,6 +2466,10 @@ try {
         if (_wd.lengthSq() > 0.5) w.fwd.copy(_wd);
         // 靠右走，避免來回的角色重疊
         w.pos.x += -w.fwd.z * w.side; w.pos.z += w.fwd.x * w.side;
+        if (touring && !walking) {
+          _wd.set(camera.position.x - w.pos.x, 0, camera.position.z - w.pos.z);
+          if (_wd.lengthSq() > 1e-4) w.fwd.copy(_wd.normalize());
+        }
       }
       const ph = walkerTime * 9 + w.phase * 20;
       const swing = walking ? Math.sin(ph) : 0;
@@ -2459,7 +2508,8 @@ try {
       }
       if (w.tag) {
         // CSS2DRenderer 依 object.visible 決定是否顯示，不能直接改 style.display
-        const near = toggles.names && camera.position.distanceTo(w.pos) < 14;
+        const cd = camera.position.distanceTo(w.pos);
+        const near = (toggles.names !== "off" && cd < 14) || (w.lolo && loloGo.s !== null && cd < 30);
         w.tag.visible = near;
         if (near) w.tag.position.set(w.pos.x, w.pos.y + k * 1.6, w.pos.z);
       }
@@ -3025,6 +3075,7 @@ try {
       const t = terraces.find((x) => x.zone.id === zid);
       flyTo(t.center.clone().add(new THREE.Vector3(2.75, 5.3, 6.2).multiplyScalar(t.zone.radius / 2.0 * 1.25)), t.center.clone());
     } else select("zone", zid);
+    loloWalkTo(zid);
     renderTour();
   }
   function startTour(loop = false) {
@@ -3036,6 +3087,7 @@ try {
   }
   function endTour() {
     tour.on = false;
+    loloGo.s = null; // 洛洛從目前位置繼續原本的來回路線
     tourEl.hidden = true;
     document.body.classList.remove("touring");
     document.getElementById("tourBtn").setAttribute("aria-pressed", "false");
@@ -3451,7 +3503,7 @@ try {
     if (lang === "en") url.searchParams.set("lang", "en"); else url.searchParams.delete("lang");
     history.replaceState(null, "", url);
     applyStaticI18n();
-    renderLabels(); renderPresets(); renderPause(); renderWalkerTags();
+    renderLabels(); renderPresets(); renderPause(); renderWalkerTags(); renderNamesBtn();
     renderAuth(); renderDiaryFilter(); renderSidebar();
     if (!diaryEl.hidden) renderDiary();
     if (sel.type) renderCard();
