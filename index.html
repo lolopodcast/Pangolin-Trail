@@ -155,6 +155,8 @@ body.sidebar-open #diary,body.sidebar-open #legend{right:350px}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#2fb36b;box-shadow:0 0 0 3px rgba(47,179,107,.2);animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.35}}
 #diaryFilter{margin:8px 0 6px;min-height:40px;border-radius:10px;border:1px solid rgba(31,36,33,.14);background:#fff;font:500 13px var(--font);padding:0 8px;color:var(--ink)}
+.dy-opt{display:flex;align-items:center;gap:6px;font-size:12px;color:#4a4f49;margin:0 0 6px;min-height:32px;cursor:pointer}
+.dy-opt input{width:18px;height:18px;accent-color:var(--forest)}
 #diaryList{list-style:none;margin:0;padding:0;overflow:auto;font-size:12px;line-height:1.5}
 #diaryList li{padding:7px 4px;border-top:1px solid rgba(31,36,33,.07);display:flex;gap:8px}
 #diaryList time{font:600 11px ui-monospace,Consolas,monospace;color:#6a7368;flex:none;padding-top:1px}
@@ -190,9 +192,19 @@ body.sidebar-open #diary,body.sidebar-open #legend{right:350px}
 .tour-ctl #tourEnd{margin-left:auto}
 body.touring #card{max-height:calc(100vh - 144px - 250px)}
 #help{position:fixed;inset:0;z-index:28;display:grid;place-items:center;background:rgba(20,32,26,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:16px}
-#help[hidden],#castDlg[hidden]{display:none}
-#castDlg{position:fixed;inset:0;z-index:29;display:grid;place-items:center;background:rgba(20,32,26,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:16px}
-.cast-box{width:min(720px,100%)}
+#help[hidden]{display:none}
+.help-tabs{margin:8px 0 4px}
+.help-pane[hidden]{display:none}
+.gloss{margin:10px 0 0}
+.gloss dt{font-weight:700;color:var(--forest);margin-top:12px;font-size:14px}
+.gloss dd{margin:4px 0 0;font-size:13px;line-height:1.65;color:#3f463f}
+.gl-lines{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:12px}
+.gl-lines>span{display:inline-flex;align-items:center;gap:6px}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:6px;margin-top:8px}
+.icon-grid .ic{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:6px 8px;font-size:12px;line-height:1.4;box-shadow:0 2px 8px rgba(74,42,20,.06)}
+.icon-grid canvas{width:36px;height:36px;flex:none}
+.cast-roles{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:#f1ece0;font-size:13px;line-height:1.65}
+.cast-roles b{display:block;color:var(--forest)}
 #castList{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
 .cast-card{background:#fff;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,42,20,.06);font-size:12px;line-height:1.55;scroll-margin:12px}
 .cast-card.lolo{grid-column:1/-1;display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center}
@@ -202,7 +214,7 @@ body.touring #card{max-height:calc(100vh - 144px - 250px)}
 .cast-card .en-name{font-size:11px;color:#6a7368;margin-bottom:6px}
 .cast-card .k{display:block;font:700 9px ui-monospace,Consolas,monospace;letter-spacing:1.5px;color:#6a7368;text-transform:uppercase;margin-top:6px}
 .cast-card.flash{outline:3px solid var(--sun)}
-.help-box{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px 22px 20px;position:relative}
+.help-box{width:min(680px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px 22px 20px;position:relative}
 .help-box h2{margin:6px 44px 6px 0;color:var(--forest)}
 .lang-pick{display:inline-flex;gap:4px;margin:10px 0 2px;padding:4px;border-radius:12px;background:#efe9dc}
 .lang-pick .btn{min-height:40px;padding:0 16px;border-radius:9px;font-size:14px}
@@ -342,6 +354,7 @@ body.reduce-motion .live-dot{animation:none}
     <button class="close-x" id="diaryClose" type="button" aria-label="關閉" data-i18n-aria="close">×</button>
   </div>
   <select id="diaryFilter" aria-label="篩選概念線" data-i18n-aria="filterTrails"></select>
+  <label class="dy-opt"><input type="checkbox" id="diaryArriveOnly"> <span data-i18n="arriveOnly">只看抵達</span></label>
   <ol id="diaryList"></ol>
 </aside>
 
@@ -393,7 +406,7 @@ body.reduce-motion .live-dot{animation:none}
   </div>
 </section>
 
-<!-- 操作說明（第一次進入時顯示） -->
+<!-- 說明：操作／名詞說明／角色圖鑑（第一次進入時顯示操作分頁） -->
 <div id="help" hidden>
   <div class="panel help-box" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <button class="close-x" id="helpClose" type="button" aria-label="關閉" data-i18n-aria="close">×</button>
@@ -403,31 +416,50 @@ body.reduce-motion .live-dot{animation:none}
       <button type="button" class="btn" data-lang="en" lang="en">English</button>
     </div>
     <h2 id="helpTitle" data-i18n="helpTitle">歡迎來到穿山甲大學</h2>
-    <p class="muted" data-i18n="helpSub"></p>
-    <ol class="help-steps">
-      <li><b data-i18n="help1t"></b><span data-i18n="help1d"></span></li>
-      <li><b data-i18n="help2t"></b><span data-i18n="help2d"></span></li>
-      <li><b data-i18n="help3t"></b><span data-i18n="help3d"></span></li>
-    </ol>
-    <p class="muted rm-help" data-i18n="rmHelp"></p>
-    <p class="credit" data-i18n="credit"></p>
-    <p class="demo-links"><span data-i18n="demoLinks">簡報模式（教師用）</span>：<a href="?demo=1&amp;lang=zh">中文</a>｜<a href="?demo=1&amp;lang=en">English</a>｜<a href="?demo=1&amp;lang=both" data-i18n="demoBoth">中英並列</a></p>
+    <div class="tabs help-tabs" role="tablist">
+      <button class="tab" role="tab" id="htOps" aria-selected="true" aria-controls="hpOps" data-i18n="tabOps">操作</button>
+      <button class="tab" role="tab" id="htGloss" aria-selected="false" aria-controls="hpGloss" data-i18n="tabGloss">名詞說明</button>
+      <button class="tab" role="tab" id="htCast" aria-selected="false" aria-controls="hpCast" data-i18n="tabCast">角色圖鑑</button>
+    </div>
+
+    <div class="help-pane" id="hpOps" role="tabpanel" aria-labelledby="htOps">
+      <p class="muted" data-i18n="helpSub"></p>
+      <ol class="help-steps">
+        <li><b data-i18n="help1t"></b><span data-i18n="help1d"></span></li>
+        <li><b data-i18n="help2t"></b><span data-i18n="help2d"></span></li>
+        <li><b data-i18n="help3t"></b><span data-i18n="help3d"></span></li>
+      </ol>
+      <p class="muted rm-help" data-i18n="rmHelp"></p>
+      <p class="credit" data-i18n="credit"></p>
+      <p class="demo-links"><span data-i18n="demoLinks">簡報模式（教師用）</span>：<a href="?demo=1&amp;lang=zh">中文</a>｜<a href="?demo=1&amp;lang=en">English</a>｜<a href="?demo=1&amp;lang=both" data-i18n="demoBoth">中英並列</a></p>
+    </div>
+
+    <div class="help-pane" id="hpGloss" role="tabpanel" aria-labelledby="htGloss" hidden>
+      <dl class="gloss">
+        <dt data-i18n="gZoneT"></dt><dd data-i18n="gZoneD"></dd>
+        <dt data-i18n="gLinkT"></dt><dd><span data-i18n="gLinkD"></span>
+          <div class="gl-lines">
+            <span><svg width="34" height="8" aria-hidden="true"><line x1="2" y1="4" x2="32" y2="4" stroke="#c8432f" stroke-width="4" stroke-linecap="round"/></svg><span data-i18n="linkCase"></span></span>
+            <span><svg width="34" height="8" aria-hidden="true"><line x1="2" y1="4" x2="32" y2="4" stroke="#c8432f" stroke-width="4" stroke-dasharray="7 5"/></svg><span data-i18n="linkConcept"></span></span>
+            <span><svg width="34" height="8" aria-hidden="true"><line x1="3" y1="4" x2="32" y2="4" stroke="#c8432f" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 7"/></svg><span data-i18n="linkExtend"></span></span>
+          </div></dd>
+        <dt data-i18n="gIconT"></dt><dd><span data-i18n="gIconD"></span><div id="iconGrid" class="icon-grid"></div></dd>
+        <dt data-i18n="gTagT"></dt><dd data-i18n="gTagD"></dd>
+        <dt data-i18n="gDiaryT"></dt><dd data-i18n="gDiaryD"></dd>
+        <dt data-i18n="gSoundT"></dt><dd data-i18n="gSoundD"></dd>
+      </dl>
+    </div>
+
+    <div class="help-pane" id="hpCast" role="tabpanel" aria-labelledby="htCast" hidden>
+      <p class="muted" data-i18n="castSub"></p>
+      <div class="cast-roles"><b data-i18n="castRolesT"></b><span data-i18n="castRolesD"></span></div>
+      <div id="castList"></div>
+    </div>
+
     <div class="row">
-      <button class="btn ghost" id="helpCast" type="button" data-i18n="castBtn">角色圖鑑</button>
       <button class="btn ghost" id="helpStart" type="button" data-i18n="helpStart">開始探索</button>
       <button class="btn primary" id="helpTour" type="button" data-i18n="helpTour">跟著洛洛走</button>
     </div>
-  </div>
-</div>
-
-<!-- 角色圖鑑 -->
-<div id="castDlg" hidden>
-  <div class="panel help-box cast-box" role="dialog" aria-modal="true" aria-labelledby="castTitle">
-    <button class="close-x" id="castClose" type="button" aria-label="關閉" data-i18n-aria="close">×</button>
-    <div class="eyebrow">CAST</div>
-    <h2 id="castTitle" data-i18n="castTitle">角色圖鑑</h2>
-    <p class="muted" data-i18n="castSub"></p>
-    <div id="castList"></div>
   </div>
 </div>
 
@@ -778,7 +810,10 @@ const DATA = {
     { id: "T13",  from: "W4-5",  to: "W9-3",  link: "concept", carry: "canvas",    walker: "hare",      label: { zh: "商業模式圖", en: "Business Model Canvas" } },
     { id: "T14",  from: "W3-4",  to: "W12-1", link: "extend",  carry: "map",       walker: "eagle",     label: { zh: "企業範疇", en: "Corporate scope" } },
     { id: "T15",  from: "W12-5", to: "W15-1", link: "extend",  carry: "handshake", walker: "magpie",    label: { zh: "從垂直關係到策略聯盟", en: "From vertical ties to alliances" } },
-    { id: "T16",  from: "W14-3", to: "W15-1", link: "extend",  carry: "suitcase",  walker: "wagtail",   label: { zh: "進入模式與聯盟", en: "Entry modes & alliances" } }
+    { id: "T16",  from: "W14-3", to: "W15-1", link: "concept",  carry: "suitcase",  walker: "wagtail",   label: { zh: "進入模式與聯盟", en: "Entry modes & alliances" } },
+    { id: "T17",  from: "W16-0", to: "W3-3",  link: "extend",  carry: "map",       walker: "pangolin",  label: { zh: "期末整合：回到策略分析架構", en: "Term-project synthesis: back to the strategy framework" } },
+    { id: "T18",  from: "W3-3",  to: "W10-4", link: "case",    carry: "plane",     walker: "pangolin",  label: { zh: "Ryanair 個案", en: "Ryanair case" } },
+    { id: "T19",  from: "W2-5",  to: "W4-3",  link: "extend",  carry: "flask",     walker: "partridge", label: { zh: "假說驗證與階段性投資", en: "Hypothesis testing and staged investment" } }
   ],
   // 角色（見 CONTENT 第 4 節）：active = 活動時段（分鐘，null 為全天）；nightExtra = 夜晚額外增加的數量
   cast: {
@@ -795,9 +830,10 @@ const DATA = {
     partridge: { name: { zh: "竹雞", en: "Bamboo partridge" },  speed: [0.3, 0.34],  active: null,
       bio: { zh: "台灣竹雞是台灣特有種，常成群在地面覓食，叫聲響亮，常被形容像「雞狗乖」。", en: "The Taiwan bamboo partridge is endemic to Taiwan; it forages on the ground in small groups and has a loud, well-known call." } }
   },
-  // 固定在某區繞圈的角色（不搬運概念）
+  // 不傳遞概念、只在步道上散步的角色
   ambient: [
-    { zone: "Z01", walker: "pangolin", lolo: true, count: 1 },
+    // 洛洛沿著整條步道，從大學入口走到登頂觀景台再折返，象徵走完一學期
+    { route: ["Z01", "Z10"], walker: "pangolin", lolo: true, count: 1 },
     { zone: "Z02", walker: "partridge", count: 2 },
     { zone: "Z06", walker: "hare", count: 1 }
   ],
@@ -869,7 +905,14 @@ const DATA = {
       help3t: "跟著洛洛走", help3d: "按「跟著洛洛」自動導覽十個區塊；修課同學可從右上角「學生入口」進入單元。",
       helpStart: "開始探索", helpTour: "跟著洛洛走",
       credit: "作者：駱世民教授（國立暨南國際大學國際企業學系）・「穿山甲大學」為虛構世界・AI 協作開發・播放影片時才會連線到 YouTube",
-      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰", demoLinks: "簡報模式（教師用）", demoBoth: "中英並列",
+      dragHandle: "拖曳調整高度", searchLabel: "搜尋", topView: "俯瞰", demoLinks: "簡報模式（教師用）", demoBoth: "中英並列", arriveOnly: "只看抵達", tabOps: "操作", tabGloss: "名詞說明", tabCast: "角色圖鑑",
+      gZoneT: "步道區塊與細項", gZoneD: "10 片台地對應 16 週課程，從山腳的大學入口一路爬到山頂。台地上每個小模型是一個「細項」（子主題），點選可以看到白話說明、重點與預習影片。",
+      gLinkT: "概念線", gLinkD: "同一個案例或概念在不同週再次出現時，就用一條線把兩個細項連起來，讓你看見前後週的關聯。線型代表連結的類型：",
+      gIconT: "概念圖示", gIconD: "動物頭上的小圓圖示，代表牠正在傳遞的概念（鏡頭拉近時才顯示）：",
+      gTagT: "動物名牌", gTagD: "打開「動物名牌」後，鏡頭拉近時動物頭上會出現「誰在傳遞什麼」，例如「穿山甲｜傳遞中：互補資產」。背著概念的動物會在兩個細項之間來回走，到站停一下代表交接。",
+      gDiaryT: "步道日記", gDiaryD: "即時記錄背著概念的動物何時出發、何時抵達（使用畫面上的時間）。可以只看抵達，或只看目前選取的區塊、細項、概念線的相關紀錄。",
+      gSoundT: "聲音", gSoundD: "以瀏覽器即時合成，不載入任何音檔。每個區塊有不同的調性與音色；清晨鳥鳴最多、白天旋律正常、黃昏音色轉暖放慢、夜晚以蟲鳴為主。預設關閉。",
+      castRolesT: "角色分工", castRolesD: "穿山甲負責多數案例與核心概念（台積電、HTC、鴻海、價值鏈…）；野兔跑得快，負責創新與速度相關的概念；台灣藍鵲成群合作，負責網路效應與策略聯盟；白鶺鴒會遷徙，負責海外進入模式；大冠鷲在高空俯瞰，負責企業範疇；竹雞負責實質選擇權與假說驗證。洛洛則沿著整條步道，帶你走完一學期。", loloRoute: "整條步道：從 Z01 大學入口走到 Z10 登頂觀景台，再走回來", diarySel: "目前選取的區塊／細項／概念線", diaryNeedSel: "先點選一個區塊、細項或概念線，這裡會只顯示相關紀錄。",
       namesTip: "鏡頭拉近時，在動物頭上顯示名牌與正在傳遞的概念", packsTip: "鏡頭拉近時，在動物頭上顯示所背概念的小圖示",
       linesTip: "顯示所有概念線（區塊之間概念的關聯）", diaryTip: "記錄動物出發、抵達的即時紀錄", topTip: "從正上方俯瞰整條步道",
       pauseTip: "暫停或繼續時間流動", soundTip: "開啟或關閉配樂與環境音（預設關閉）",
@@ -906,7 +949,14 @@ const DATA = {
       help3t: "Follow Lolo", help3d: "Press “Tour” for a guided walk through all ten zones; enrolled students can sign in via “Student” at the top right.",
       helpStart: "Start exploring", helpTour: "Follow Lolo",
       credit: "By Prof. Shihmin Lo (Dept. of International Business Studies, National Chi Nan University) · “Pangolin University” is fictional · Built with AI assistance · Videos connect to YouTube only when played",
-      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view", demoLinks: "Presentation mode (for instructors)", demoBoth: "Bilingual",
+      dragHandle: "Drag to resize", searchLabel: "Search", topView: "Top view", demoLinks: "Presentation mode (for instructors)", demoBoth: "Bilingual", arriveOnly: "Arrivals only", tabOps: "How to use", tabGloss: "Glossary", tabCast: "Characters",
+      gZoneT: "Zones and topics", gZoneD: "Ten terraces map the 16-week course, climbing from the University Gate at the foot of the hill to the summit. Each small model on a terrace is a topic; tap it for a plain-language summary, key points and preview videos.",
+      gLinkT: "Concept links", gLinkD: "When the same case or concept reappears in another week, a line connects the two topics so you can see how the weeks build on each other. The line style shows the type of link:",
+      gIconT: "Concept icons", gIconD: "The small round icon above an animal shows the concept it is delivering (visible when zoomed in):",
+      gTagT: "Name tags", gTagD: "Turn on “Name tags” and, when zoomed in, each animal shows who it is and what it is delivering, e.g. “Pangolin | Delivering: Complementary assets”. Animals carrying concepts walk back and forth between two topics; a short stop means a handoff.",
+      gDiaryT: "Trail log", gDiaryD: "A live record of when concept-carrying animals depart and arrive (using the on-screen clock). You can show arrivals only, or only entries related to the selected zone, topic or link.",
+      gSoundT: "Sound", gSoundD: "Synthesized live in the browser with no audio files. Each zone has its own key and timbre; dawn has the most birdsong, daytime normal melodies, dusk warmer and slower tones, and night mostly insects. Off by default.",
+      castRolesT: "Who carries what", castRolesD: "Pangolins carry most cases and core concepts (TSMC, HTC, Foxconn, value chain…); hares are fast and carry innovation- and speed-related ideas; Taiwan blue magpies work in groups and carry network effects and alliances; white wagtails migrate and carry foreign entry modes; the soaring eagle carries corporate scope; the bamboo partridge carries real options and hypothesis testing. Lolo walks the whole trail with you through the semester.", loloRoute: "The whole trail: from Z01 University Gate up to Z10 Summit Lookout and back", diarySel: "Current selection (zone / topic / link)", diaryNeedSel: "Select a zone, topic or link first — the log will then show only related entries.",
       namesTip: "When zoomed in, show a name tag and the concept each animal is delivering", packsTip: "When zoomed in, show a small icon of the concept each animal carries",
       linesTip: "Show all concept links (how ideas connect across zones)", diaryTip: "A live log of animals departing and arriving", topTip: "View the whole trail from above",
       pauseTip: "Pause or resume the flow of time", soundTip: "Turn music and ambient sound on or off (off by default)",
@@ -2163,6 +2213,15 @@ try {
     for (let k = 0; k < extra; k++) spawn({ species: tr.walker, trail: tr, path, s: rng() * path.len, active: [1020, 360] });
   });
   DATA.ambient.forEach((am) => {
+    if (am.route) {
+      // 指定起訖區塊：沿步道路網來回（到端點停留後折返）
+      const [za, zb] = am.route.map((z) => terraces.find((t) => t.zone.id === z));
+      const a = nearestOf(ringOf.get(za.zone.id), new THREE.Vector3(za.center.x, za.top, za.center.z + za.zone.radius))[0];
+      const b = nearestOf(ringOf.get(zb.zone.id), zb.center)[0];
+      const path = makePath(dijkstra(a, b).map((n) => nodes[n].p.clone()));
+      for (let k = 0; k < am.count; k++) spawn({ species: am.walker, path, lolo: !!am.lolo, s: 0, active: DATA.cast[am.walker].active });
+      return;
+    }
     const ring = ringOf.get(am.zone);
     const path = makePath(ring.map((n) => nodes[n].p.clone()), true);
     for (let k = 0; k < am.count; k++) spawn({ species: am.walker, path, loopPath: true, lolo: !!am.lolo, s: (k / am.count) * path.len, active: DATA.cast[am.walker].active });
@@ -2224,6 +2283,11 @@ try {
       case "map": g.beginPath(); g.moveTo(34, 46); g.lineTo(52, 40); g.lineTo(76, 48); g.lineTo(94, 42); g.lineTo(94, 84); g.lineTo(76, 90); g.lineTo(52, 82); g.lineTo(34, 88); g.closePath(); g.moveTo(52, 40); g.lineTo(52, 82); g.moveTo(76, 48); g.lineTo(76, 90); g.stroke(); break;
       case "handshake": g.beginPath(); g.moveTo(30, 60); g.lineTo(52, 52); g.lineTo(70, 66); g.lineTo(60, 74); g.moveTo(98, 60); g.lineTo(76, 52); g.lineTo(60, 60); g.moveTo(54, 80); g.lineTo(74, 72); g.stroke(); break;
       case "suitcase": g.strokeRect(36, 52, 56, 36); g.beginPath(); g.roundRect(52, 40, 24, 12, 4); g.stroke(); break;
+      case "plane": // 俯視的飛機：機身、主翼、尾翼
+        g.beginPath(); g.moveTo(64, 30); g.lineTo(64, 96);
+        g.moveTo(64, 56); g.lineTo(32, 72); g.moveTo(64, 56); g.lineTo(96, 72);
+        g.moveTo(64, 88); g.lineTo(52, 96); g.moveTo(64, 88); g.lineTo(76, 96); g.stroke(); break;
+      case "flask": g.beginPath(); g.moveTo(54, 34); g.lineTo(54, 58); g.lineTo(38, 90); g.lineTo(90, 90); g.lineTo(74, 58); g.lineTo(74, 34); g.moveTo(48, 34); g.lineTo(80, 34); g.moveTo(46, 76); g.lineTo(82, 76); g.stroke(); break;
       default: g.beginPath(); g.arc(64, 64, 10, 0, 7); g.fill();
     }
   }
@@ -2575,6 +2639,7 @@ try {
       flyToward(c, new THREE.Vector3(0.16, 0.6, 0.78).normalize().multiplyScalar(Math.max(9, size * 1.25)));
     }
     renderSidebar();
+    if (!diaryEl.hidden && diaryFilter.value === "__sel") renderDiary();
     dirty = true;
   }
   function closeCard() {
@@ -2583,6 +2648,7 @@ try {
     stopVideo();
     updateLabelState(); setHighlight([]); showPins(null); showRelatedLines();
     renderSidebar();
+    if (!diaryEl.hidden && diaryFilter.value === "__sel") renderDiary();
     dirty = true;
   }
 
@@ -2881,8 +2947,11 @@ try {
   function onWalkerStop(w, end) { logEvent(w, "arrive", end === "to" ? w.trail.to : w.trail.from); }
   function onWalkerDepart(w) { logEvent(w, "depart", w.dir > 0 ? w.trail.from : w.trail.to); }
   function renderDiary() {
-    const f = diaryFilter.value;
-    const rows = diary.filter((d) => !f || d.trail === f).slice(0, 40);
+    const f = diaryFilter.value, arriveOnly = document.getElementById("diaryArriveOnly").checked;
+    // 「目前選取」：只看與選取的區塊、細項或概念線相關的紀錄
+    const selTrails = f === "__sel" ? (sel.type ? trailsFor(sel.type, sel.id) : null) : null;
+    if (f === "__sel" && !selTrails) { diaryList.innerHTML = `<li class="empty">${esc(tr("diaryNeedSel"))}</li>`; return; }
+    const rows = diary.filter((d) => (!f || (selTrails ? selTrails.includes(d.trail) : d.trail === f)) && (!arriveOnly || d.type === "arrive")).slice(0, 40);
     diaryList.innerHTML = rows.length ? rows.map((d) => {
       const t = trailById.get(d.trail), it = itemById.get(d.item);
       const msg = fmt(tr(d.type === "arrive" ? "arriveMsg" : "departMsg"), { who: esc(pick(DATA.cast[d.species].name)), place: esc(`${it.id} ${pick(it.name)}`), what: esc(pick(t.label)) });
@@ -2891,10 +2960,11 @@ try {
   }
   function renderDiaryFilter() {
     const cur = diaryFilter.value;
-    diaryFilter.innerHTML = `<option value="">${esc(tr("diaryAll"))}</option>` + DATA.trails.map((t) => `<option value="${t.id}">${t.id}・${esc(pick(t.label))}</option>`).join("");
+    diaryFilter.innerHTML = `<option value="">${esc(tr("diaryAll"))}</option><option value="__sel">${esc(tr("diarySel"))}</option>` + DATA.trails.map((t) => `<option value="${t.id}">${t.id}・${esc(pick(t.label))}</option>`).join("");
     diaryFilter.value = cur;
   }
   diaryFilter.addEventListener("change", renderDiary);
+  document.getElementById("diaryArriveOnly").addEventListener("change", renderDiary);
   function setDiary(open) {
     diaryEl.hidden = !open;
     document.getElementById("diaryBtn").setAttribute("aria-pressed", String(open));
@@ -3010,16 +3080,16 @@ try {
 
   /* ---------- 操作說明（第一次進入時顯示） ---------- */
   const helpEl = document.getElementById("help");
-  function openHelp() { helpEl.hidden = false; document.getElementById("helpStart").focus(); }
+  function openHelp(tab = "ops") { helpEl.hidden = false; setHelpTab(tab); document.getElementById("helpStart").focus(); }
   function closeHelp() { helpEl.hidden = true; store.set("onboarded", true); }
-  document.getElementById("helpBtn").addEventListener("click", openHelp);
+  document.getElementById("helpBtn").addEventListener("click", () => openHelp());
   document.getElementById("helpClose").addEventListener("click", closeHelp);
   document.getElementById("helpStart").addEventListener("click", closeHelp);
   document.getElementById("helpTour").addEventListener("click", () => { closeHelp(); startTour(); });
   helpEl.addEventListener("click", (e) => { if (e.target === helpEl) closeHelp(); });
 
   /* ---------- 角色圖鑑 ---------- */
-  const castDlg = document.getElementById("castDlg"), castList = document.getElementById("castList");
+  const castList = document.getElementById("castList");
   let castCam = null;
   function drawCastThumb(cv, species, lolo) {
     try {
@@ -3057,12 +3127,12 @@ try {
     let h = `<div class="cast-card lolo" id="cast-lolo"><canvas width="240" height="240" data-sp="pangolin" data-lolo="1"></canvas><div>
       <h3>${esc(pick(DATA.meta.guide))}</h3><div class="en-name">${esc(tr("castGuide"))}</div>
       <div>${esc(pick(DATA.meta.guideBio))}</div>
-      <span class="k">${esc(tr("castZones"))}</span>${zoneNames(["Z01"])}</div></div>`;
+      <span class="k">${esc(tr("castZones"))}</span>${esc(tr("loloRoute"))}</div></div>`;
     Object.entries(DATA.cast).forEach(([sp, c]) => {
       const info = castInfo(sp);
       const active = c.active ? tr("dayTime") : tr("allDay");
       h += `<div class="cast-card" id="cast-${sp}"><canvas width="240" height="240" data-sp="${sp}"></canvas>
-        <h3>${esc(c.name.zh)}</h3><div class="en-name">${esc(c.name.en)}</div>
+        <h3>${esc(pick(c.name))}</h3><div class="en-name">${esc(lang === "en" ? c.name.zh : c.name.en)}</div>
         <div>${esc(pick(c.bio))}</div>
         <span class="k">${esc(tr("castLinks"))}</span>${info.trails.length ? [...new Set(info.trails.map((t) => pick(t.label)))].map(esc).join("、") : esc(tr("castNone"))}
         <span class="k">${esc(tr("castZones"))}</span>${zoneNames(info.zones)}
@@ -3071,86 +3141,114 @@ try {
     castList.innerHTML = h;
     castList.querySelectorAll("canvas").forEach((cv) => drawCastThumb(cv, cv.dataset.sp, !!cv.dataset.lolo));
   }
+  // 說明的三個分頁
+  let helpTab = "ops";
+  function setHelpTab(t) {
+    helpTab = t;
+    [["Ops", "ops"], ["Gloss", "gloss"], ["Cast", "cast"]].forEach(([k, key]) => {
+      document.getElementById("ht" + k).setAttribute("aria-selected", String(key === t));
+      document.getElementById("hp" + k).hidden = key !== t;
+    });
+    if (t === "cast") renderCast();
+    if (t === "gloss") renderIconGrid();
+  }
+  [["htOps", "ops"], ["htGloss", "gloss"], ["htCast", "cast"]].forEach(([id, t]) => document.getElementById(id).addEventListener("click", () => setHelpTab(t)));
+  // 概念圖示對照表：每種圖示對應哪些概念線
+  function renderIconGrid() {
+    const byCarry = new Map();
+    DATA.trails.forEach((t) => { const arr = byCarry.get(t.carry) || []; if (!arr.includes(pick(t.label))) arr.push(pick(t.label)); byCarry.set(t.carry, arr); });
+    const grid = document.getElementById("iconGrid");
+    grid.innerHTML = [...byCarry].map(([carry, labels]) => `<div class="ic"><canvas width="128" height="128" data-carry="${carry}"></canvas><span>${labels.map(esc).join("、")}</span></div>`).join("");
+    grid.querySelectorAll("canvas").forEach((cv) => {
+      const g = cv.getContext("2d");
+      g.fillStyle = "#fbf8f1"; g.beginPath(); g.arc(64, 64, 56, 0, 7); g.fill();
+      g.strokeStyle = "#004030"; g.lineWidth = 7; g.beginPath(); g.arc(64, 64, 55, 0, 7); g.stroke();
+      drawIcon(g, cv.dataset.carry);
+    });
+  }
   function openCast(focus) {
-    castDlg.hidden = false;
-    renderCast();
-    document.getElementById("castClose").focus();
+    openHelp("cast");
     if (focus) {
       const card = document.getElementById("cast-" + focus);
       if (card) { card.scrollIntoView({ block: "center", behavior: reducedMotion ? "auto" : "smooth" }); card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1600); }
     }
   }
-  function closeCast() { castDlg.hidden = true; }
-  document.getElementById("helpCast").addEventListener("click", () => { closeHelp(); openCast(); });
-  document.getElementById("castClose").addEventListener("click", closeCast);
-  castDlg.addEventListener("click", (e) => { if (e.target === castDlg) closeCast(); });
+
 
   /* ---------- 合成配樂（Web Audio，預設關閉，不載入任何音檔） ---------- */
+  // 不再使用持續的低音墊底：改為間歇淡入淡出的柔和和弦（像呼吸），整體音域偏高並濾掉低頻；
+  // 風聲只在高處區塊（wind ≥ 0.5）出現；清晨、白天、黃昏、夜晚各有不同的旋律密度、音色與環境音。
   const SCALES = { major: [0, 2, 4, 7, 9], minor: [0, 3, 5, 7, 10] };
   const midiHz = (n) => 440 * Math.pow(2, (n - 69) / 12);
   const arng = mulberry32(31); // 配樂專用亂數，不影響場景
-  const audio = { ctx: null, on: false, master: null, filter: null, pads: [], windGain: null, zone: null, cfg: null, nextNote: 0, nextAmb: 0 };
+  const audio = { ctx: null, on: false, master: null, bus: null, windGain: null, zone: null, cfg: null, nextNote: 0, nextAmb: 0, nextSwell: 0 };
+  // 時段設定：gap = 旋律間隔倍數、gain = 旋律音量、lift = 音域位移、wave = 音色、
+  // birds = 鳥鳴間隔 [最短, 最長]（null 為不出現）、crickets = 蟲鳴間隔、swell = 和弦音量
+  const PHASES = {
+    dawn:  { gap: 1.6, gain: 0.05,  lift: 0,   wave: "sine",     birds: [0.9, 2.2], crickets: null,       swell: 0.022 },
+    day:   { gap: 1.0, gain: 0.065, lift: 0,   wave: null,       birds: [2.5, 6],   crickets: null,       swell: 0.026 },
+    dusk:  { gap: 1.4, gain: 0.055, lift: -5,  wave: "triangle", birds: [6, 11],    crickets: [4, 8],     swell: 0.026 },
+    night: { gap: 2.2, gain: 0.04,  lift: -5,  wave: "sine",     birds: null,       crickets: [0.8, 2.2], swell: 0.018 }
+  };
+  function currentPhase() {
+    const m = ((minutes % 1440) + 1440) % 1440;
+    if (m >= 330 && m < 480) return "dawn";
+    if (m >= 480 && m < 1020) return "day";
+    if (m >= 1020 && m < 1200) return "dusk";
+    return "night";
+  }
   function initAudio() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return false;
     const ctx = new AC();
     audio.ctx = ctx;
-    audio.master = ctx.createGain(); audio.master.gain.value = 0; audio.master.connect(ctx.destination);
-    // 底層和聲：三個振盪器經過緩慢變化的低通濾波
-    audio.filter = ctx.createBiquadFilter(); audio.filter.type = "lowpass"; audio.filter.frequency.value = 900; audio.filter.Q.value = 0.6;
-    const padGain = ctx.createGain(); padGain.gain.value = 0.09;
-    audio.filter.connect(padGain); padGain.connect(audio.master);
-    const lfo = ctx.createOscillator(), lfoG = ctx.createGain();
-    lfo.frequency.value = 0.07; lfoG.gain.value = 320; lfo.connect(lfoG); lfoG.connect(audio.filter.frequency); lfo.start();
-    for (let i = 0; i < 3; i++) {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = "triangle"; g.gain.value = i === 0 ? 0.5 : 0.32;
-      o.connect(g); g.connect(audio.filter); o.start();
-      audio.pads.push(o);
-    }
-    // 風聲：濾波後的雜訊，頻帶緩慢飄移
+    audio.master = ctx.createGain(); audio.master.gain.value = 0;
+    const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 160; hp.Q.value = 0.5; // 濾掉低頻，避免嗡嗡聲
+    audio.master.connect(hp); hp.connect(ctx.destination);
+    audio.bus = audio.master;
+    // 風聲（只在高處區塊）：濾波後的雜訊，頻帶緩慢飄移
     const buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = arng() * 2 - 1;
     const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 500; bp.Q.value = 0.7;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 700; bp.Q.value = 0.8;
     audio.windGain = ctx.createGain(); audio.windGain.gain.value = 0;
     src.connect(bp); bp.connect(audio.windGain); audio.windGain.connect(audio.master); src.start();
     const wl = ctx.createOscillator(), wlg = ctx.createGain();
-    wl.frequency.value = 0.11; wlg.gain.value = 180; wl.connect(wlg); wlg.connect(bp.frequency); wl.start();
+    wl.frequency.value = 0.09; wlg.gain.value = 260; wl.connect(wlg); wlg.connect(bp.frequency); wl.start();
     return true;
   }
-  // 切換區塊：和聲平滑滑到新的調性，風聲跟著調整
   function soundZone(zid) {
     const cfg = DATA.sound[zid];
     if (!cfg || !audio.ctx) return;
     audio.zone = zid; audio.cfg = cfg;
-    const t = audio.ctx.currentTime;
-    const third = cfg.mode === "minor" ? 3 : 4;
-    [cfg.root - 12, cfg.root - 5, cfg.root + third].forEach((n, i) => {
-      audio.pads[i].type = cfg.wave;
-      audio.pads[i].frequency.setTargetAtTime(midiHz(n), t, 0.8);
-    });
-    audio.windGain.gain.setTargetAtTime(cfg.wind * 0.045, t, 1.2);
+    audio.windGain.gain.setTargetAtTime(cfg.wind >= 0.5 ? cfg.wind * 0.03 : 0, audio.ctx.currentTime, 1.5);
+    audio.nextSwell = Math.min(audio.nextSwell, audio.ctx.currentTime + 0.5); // 換區時很快以新調性淡入一個和弦
   }
-  function tone(freq, start, dur, peak, type) {
+  function tone(freq, start, dur, peak, type, attack = 0.012) {
     const ctx = audio.ctx, o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.value = freq;
     g.gain.setValueAtTime(0.0001, start);
-    g.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+    g.gain.exponentialRampToValueAtTime(peak, start + attack);
     g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-    o.connect(g); g.connect(audio.master); o.start(start); o.stop(start + dur + 0.05);
+    o.connect(g); g.connect(audio.bus); o.start(start); o.stop(start + dur + 0.05);
     return o;
+  }
+  // 呼吸般的和弦：慢慢淡入、停留、再淡出，之間留白
+  function swell(cfg, ph, t) {
+    const third = cfg.mode === "minor" ? 3 : 4;
+    [0, 7, 12 + third].forEach((iv) => tone(midiHz(cfg.root + iv + ph.lift), t, 7.5, ph.swell, "sine", 2.6));
   }
   function birdChirp(t) {
     const n = 2 + Math.floor(arng() * 3), base = 2600 + arng() * 1200;
     for (let k = 0; k < n; k++) {
-      const s = t + k * 0.11, o = tone(base, s, 0.09, 0.025, "sine");
-      o.frequency.setValueAtTime(base, s); o.frequency.exponentialRampToValueAtTime(base * 1.35, s + 0.07);
+      const st = t + k * 0.11, o = tone(base, st, 0.09, 0.025, "sine");
+      o.frequency.setValueAtTime(base, st); o.frequency.exponentialRampToValueAtTime(base * 1.35, st + 0.07);
     }
   }
   function cricket(t) {
     for (let k = 0; k < 6; k++) tone(4300 + arng() * 300, t + k * 0.045, 0.03, 0.008, "sine");
   }
+  const between = ([lo, hi]) => lo + arng() * (hi - lo);
   function updateSound() {
     if (!audio.on || !audio.ctx || audio.ctx.state !== "running") return;
     // 目前所在區塊：選取的區塊，否則取鏡頭目標最近的區塊
@@ -3160,15 +3258,20 @@ try {
       terraces.forEach((t) => { const d = Math.hypot(t.center.x - controls.target.x, t.center.z - controls.target.z); if (d < best) { best = d; zid = t.zone.id; } });
     }
     if (zid !== audio.zone) soundZone(zid);
-    const now = audio.ctx.currentTime, cfg = audio.cfg;
+    const now = audio.ctx.currentTime, cfg = audio.cfg, ph = PHASES[currentPhase()];
+    if (now >= audio.nextSwell) { swell(cfg, ph, now + 0.05); audio.nextSwell = now + 9 + arng() * 7; }
     if (now >= audio.nextNote) {
       const sc = SCALES[cfg.mode], deg = sc[Math.floor(arng() * sc.length)] + (arng() < 0.3 ? 12 : 0);
-      tone(midiHz(cfg.root + deg + cfg.lift), now + 0.02, 1.8, 0.07, cfg.wave === "sine" ? "sine" : "triangle");
-      audio.nextNote = now + cfg.tempo * (0.6 + arng() * 0.9);
+      const wave = ph.wave || (cfg.wave === "sine" ? "sine" : "triangle");
+      tone(midiHz(cfg.root + 12 + deg + cfg.lift + ph.lift), now + 0.02, 1.8, ph.gain, wave);
+      audio.nextNote = now + cfg.tempo * ph.gap * (0.6 + arng() * 0.9);
     }
     if (now >= audio.nextAmb) {
-      if (night < 0.5) { birdChirp(now + 0.05); audio.nextAmb = now + 2.5 + arng() * 4; }
-      else { cricket(now + 0.05); audio.nextAmb = now + 0.8 + arng() * 1.4; }
+      // 黃昏時鳥鳴與蟲鳴交替出現
+      const useBird = ph.birds && (!ph.crickets || arng() < 0.5);
+      if (useBird) { birdChirp(now + 0.05); audio.nextAmb = now + between(ph.birds); }
+      else if (ph.crickets) { cricket(now + 0.05); audio.nextAmb = now + between(ph.crickets); }
+      else audio.nextAmb = now + 3;
     }
   }
   const soundBtn = document.getElementById("soundBtn");
@@ -3241,7 +3344,6 @@ try {
   window.addEventListener("keydown", (e) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
     if (e.key === "Escape") {
-      if (!castDlg.hidden) return closeCast();
       if (!helpEl.hidden) return closeHelp();
       if (!gateEl.hidden) return closeGate();
       if (tour.on) endTour();
@@ -3354,7 +3456,7 @@ try {
     if (!diaryEl.hidden) renderDiary();
     if (sel.type) renderCard();
     if (tour.on) renderTour();
-    if (!castDlg.hidden) renderCast();
+    if (!helpEl.hidden) setHelpTab(helpTab);
     searchBox.placeholder = tr("search");
     pins.forEach((p, id) => p.el.setAttribute("aria-label", pick(itemById.get(id).name)));
   }
